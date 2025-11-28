@@ -1,0 +1,95 @@
+import React, { useEffect, useState } from "react";
+
+interface Booking {
+  id: number;
+  status: string;
+  customer?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  availability?: {
+    startTime: string;
+    endTime: string;
+  };
+}
+
+export default function TechnicianBookings() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetch("http://localhost:8000/tech/bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setBookings(data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const updateStatus = async (id: number, status: string) => {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`http://localhost:8000/bookings/${id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      alert("⚠️ Error updating status");
+      return;
+    }
+
+    setBookings((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, status } : b))
+    );
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-2xl mb-4 font-bold">Client Bookings</h2>
+
+      {bookings.length === 0 ? (
+        <p>No bookings found.</p>
+      ) : (
+        bookings.map((b) => (
+          <div key={b.id} className="border p-4 mb-3 rounded bg-gray-100 shadow">
+            <p><b>Client:</b> {b.customer?.name}</p>
+            <p><b>Email:</b> {b.customer?.email}</p>
+            <p><b>Phone:</b> {b.customer?.phone}</p>
+
+            <p className="mt-2">
+              <b>Time Slot:</b>{" "}
+              {b.availability?.startTime} - {b.availability?.endTime}
+            </p>
+
+            <p><b>Status:</b> {b.status}</p>
+
+            {b.status === "pending" && (
+              <div className="mt-3 flex gap-3">
+                <button
+                  onClick={() => updateStatus(b.id, "confirmed")}
+                  className="bg-green-600 text-white px-3 py-1 rounded"
+                >
+                  Accept ✅
+                </button>
+                <button
+                  onClick={() => updateStatus(b.id, "cancelled")}
+                  className="bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Decline ❌
+                </button>
+              </div>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
