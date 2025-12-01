@@ -1,24 +1,77 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function MainPage() {
-    const navigate = useNavigate();
+interface HomePageProps {
+  user?: string | null; 
+}
 
-    const goToProfile = () => {
-        const role = localStorage.getItem("role")?.toLowerCase();
-        if (role === "technician") {
-            navigate("/technician-dashboard");
-        } else if (role === "client") {
-            navigate("/myProfile");
-        } else {
-            alert("Unknown role! Please update your profile.");
-        }
-    };
+export default function HomePage({ user }: HomePageProps) {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+   
+      <nav className="w-full bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <h1 className="text-2xl font-semibold text-blue-600">
+          OneFixAL
+        </h1>
 
+        <div className="flex items-center space-x-4">
+          <Link 
+            to="/technicians" 
+            className="text-gray-700 hover:text-blue-600"
+          >
+            Technicians
+          </Link>
 
-    return (
-        <div>
-            <h1>Welcome to Dashboard</h1>
-            <button onClick={goToProfile}>My Profile</button>
+          <Link 
+            to="/book" 
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Book a Tech
+          </Link>
+
+          {user ? (
+            <button 
+              onClick={() => {
+                localStorage.removeItem("token");
+                window.location.reload();
+              }} 
+              className="text-red-500 font-medium"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link 
+              to="/login" 
+              className="text-blue-600 font-medium"
+            >
+              Login
+            </Link>
+          )}
         </div>
-    );
+      </nav>
+
+     
+      <main className="flex-1 flex flex-col justify-center items-center text-center px-4">
+        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          Welcome to OneFixAL
+        </h2>
+
+        <p className="text-gray-600 max-w-2xl mb-8">
+          Fast and easy platform to connect clients with professional technicians.
+          Book a technician, manage appointments, and receive instant updates.
+        </p>
+
+        <Link 
+          to="/book"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700"
+        >
+          Get Started
+        </Link>
+      </main>
+
+    
+      <footer className="bg-white shadow-inner py-4 text-center text-gray-500">
+        © {new Date().getFullYear()} OneFixAL – All rights reserved.
+      </footer>
+    </div>
+  );
 }
