@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
-import { API_URL } from "../api/config.ts";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -109,4 +108,5 @@ export default function Signup() {
 );
 
 }
+
 
