@@ -12,7 +12,7 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('${API_URL}/signup', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/signup', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,3 +109,4 @@ export default function Signup() {
 );
 
 }
+
