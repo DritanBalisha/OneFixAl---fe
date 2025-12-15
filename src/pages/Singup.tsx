@@ -10,35 +10,35 @@ export default function Signup() {
     const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${API_URL}/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          Name: name,
-          Email: email,
-          Phone: phone,
-          Password: password,
-        }),
-      });
+  e.preventDefault();
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Signup failed");
-      }
+  try {
+   const res = await fetch(`${API_URL}/signup`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name,
+    email,
+    phone,
+    password,
+  }),
+});
 
-      const data = await res.json();
-      console.log(data);
-      alert("Signup successful!");
-      navigate("/login");
+const text = await res.text();
+const data = text ? JSON.parse(text) : null;
 
+if (!res.ok) {
+  throw new Error(data?.error || "Signup failed");
+}
 
-    } catch (error) {
-      console.error(error);
-      alert("Error signing up");
-    }
-  };
+alert("Signup successful!");
+navigate("/login");
+
+  } catch (error) {
+    console.error(error);
+    alert("Error signing up");
+  }
+};
 
   return (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -109,6 +109,7 @@ export default function Signup() {
 );
 
 }
+
 
 
 
