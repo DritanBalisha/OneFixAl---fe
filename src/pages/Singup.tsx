@@ -25,11 +25,20 @@ export default function Signup() {
 });
 
 const text = await res.text();
-const data = text ? JSON.parse(text) : null;
+console.log("STATUS:", res.status);
+console.log("RESPONSE:", text);
+
+let data = null;
+try {
+  data = text ? JSON.parse(text) : null;
+} catch (e) {
+  console.error("Invalid JSON:", text);
+}
 
 if (!res.ok) {
-  throw new Error(data?.error || "Signup failed");
+  throw new Error(data?.error || text || "Signup failed");
 }
+
 
 alert("Signup successful!");
 navigate("/login");
@@ -109,6 +118,7 @@ navigate("/login");
 );
 
 }
+
 
 
 
