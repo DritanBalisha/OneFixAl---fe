@@ -25,6 +25,8 @@ export default function Signup() {
         }),
       });
 
+      console.log("rES : ", res );
+      
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Signup failed");
@@ -110,6 +112,7 @@ export default function Signup() {
   </div>
 );
 }
+
 
 
 
