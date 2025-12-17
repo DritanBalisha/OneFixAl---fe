@@ -19,10 +19,10 @@ export default function Signup() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name,
-        email,
-        phone,
-        password,
+          Name: name,
+          Email: email,
+          Phone: phone,
+          Password: password,
       }),
     });
 
@@ -111,4 +111,5 @@ export default function Signup() {
   </div>
 );
 }
+
 
