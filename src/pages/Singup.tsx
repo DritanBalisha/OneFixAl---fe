@@ -11,39 +11,32 @@ export default function Signup() {
   const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-   const res = await fetch(`${API_URL}/signup`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    name,
-    email,
-    phone,
-    password,
-  }),
-});
+    const res = await fetch(`${API_URL}/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        password,
+      }),
+    });
 
-const text = await res.text();
-console.log("STATUS:", res.status);
-console.log("RESPONSE:", text);
+    const text = await res.text();
+    console.log("STATUS:", res.status);
+    console.log("RESPONSE:", text);
 
-let data = null;
-try {
-  data = text ? JSON.parse(text) : null;
-} catch (e) {
-  console.error("Invalid JSON:", text);
-}
+    if (!res.ok) {
+      throw new Error(text || "Signup failed");
+    }
 
-if (!res.ok) {
-  throw new Error(data?.error || text || "Signup failed");
-}
-
-
-alert("Signup successful!");
-navigate("/login");
+    alert("Signup successful!");
+    navigate("/login");
 
   } catch (error) {
     console.error(error);
@@ -118,14 +111,4 @@ navigate("/login");
     </div>
   </div>
 );
-
 }
-
-
-
-
-
-
-
-
-
