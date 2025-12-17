@@ -18,7 +18,6 @@ export default function Signup() {
     const res = await fetch(`${API_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({
         name,
         email,
@@ -112,3 +111,4 @@ export default function Signup() {
   </div>
 );
 }
+
