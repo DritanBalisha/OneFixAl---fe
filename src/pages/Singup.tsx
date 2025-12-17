@@ -11,38 +11,37 @@ export default function Signup() {
   const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
-    const res = await fetch(`${API_URL}/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_URL}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           Name: name,
           Email: email,
           Phone: phone,
           Password: password,
-      }),
-    });
+        }),
+      });
 
-    const text = await res.text();
-    console.log("STATUS:", res.status);
-    console.log("RESPONSE:", text);
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Signup failed");
+      }
 
-    if (!res.ok) {
-      throw new Error(text || "Signup failed");
+      const data = await res.json();
+      console.log(data);
+      alert("Signup successful!");
+      navigate("/login");
+
+
+    } catch (error) {
+      console.error(error);
+      alert("Error signing up");
     }
-
-    alert("Signup successful!");
-    navigate("/login");
-
-  } catch (error) {
-    console.error(error);
-    alert("Error signing up");
-  }
-};
-
+  };
+  
   return (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
@@ -111,5 +110,6 @@ export default function Signup() {
   </div>
 );
 }
+
 
 
