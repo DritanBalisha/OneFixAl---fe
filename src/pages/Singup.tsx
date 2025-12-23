@@ -11,38 +11,43 @@ export default function Signup() {
   const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${API_URL}/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          Name: name,
-          Email: email,
-          Phone: phone,
-          Password: password,
-        }),
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const res = await fetch(`${API_URL}/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Name: name,
+        Email: email,
+        Phone: phone,
+        Password: password,
+      }),
+    });
 
-      console.log("rES : ", res );
-      
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Signup failed");
-      }
-
-      const data = await res.json();
-      console.log(data);
-      alert("Signup successful!");
-      navigate("/login");
-
-
-    } catch (error) {
-      console.error(error);
-      alert("Error signing up");
+    // 1. Check if the response actually has content before parsing
+    const contentType = res.headers.get("content-type");
+    let data = null;
+    
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
     }
-  };
+
+    // 2. Handle errors
+    if (!res.ok) {
+      throw new Error(data?.error || `Server error: ${res.status}`);
+    }
+
+    // 3. Handle success
+    console.log("Success Data:", data);
+    alert("Signup successful!");
+    navigate("/login");
+
+  } catch (error: any) {
+    console.error("Signup Error:", error);
+    alert(error.message || "Error signing up");
+  }
+};
   
   return (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -112,6 +117,7 @@ export default function Signup() {
   </div>
 );
 }
+
 
 
 
