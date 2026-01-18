@@ -1,1 +1,1 @@
-export const API_URL = "onefixal-be-production.up.railway.app";
+export const API_URL = "https://onefixal-be-production.up.railway.app";
