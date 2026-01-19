@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_URL } from "../api/config.ts";
 
 type Booking = {
   id: number;
@@ -22,7 +23,7 @@ export default function MyBookings() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await fetch("http://localhost:8000/my-bookings", {
+        const res = await fetch(`${API_URL}/my-bookings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,7 +42,7 @@ export default function MyBookings() {
 
   const updateBookingStatus = async (id: number, status: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/bookings/${id}/status`, {
+      const res = await fetch(`${API_URL}/bookings/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -164,3 +165,4 @@ export default function MyBookings() {
     </div>
   );
 }
+
