@@ -36,10 +36,10 @@ export default function TechnicianProfile() {
     const fetchData = async () => {
       try {
         const [techRes, availRes] = await Promise.all([
-          fetch(``${API_URL}/users/${id}`, {
+          fetch(`${API_URL}/users/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(``${API_URL}/availability/${id}`, {
+          fetch(`${API_URL}/availability/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -147,4 +147,5 @@ export default function TechnicianProfile() {
     </div>
   );
 }
+
 
