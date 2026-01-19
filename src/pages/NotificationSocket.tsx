@@ -8,8 +8,11 @@ export default function NotificationSocket() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (!user?.id) return;
 
-  const socketBase = API_URL.replace(/^http/, "ws").replace(/\/$/, "");
-  const ws = new WebSocket(`${socketBase}/ws?user_id=${user.id}`);
+// 1. Convert protocol and remove potential double slashes
+const socketUrl = API_URL.replace(/^http/, "ws").replace(/\/$/, "");
+
+// 2. Create the WebSocket with a single set of backticks
+const ws = new WebSocket(`${socketUrl}/ws?user_id=${user.id}`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -39,5 +42,6 @@ export default function NotificationSocket() {
     </div>
   );
 }
+
 
 
