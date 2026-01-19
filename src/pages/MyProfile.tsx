@@ -66,7 +66,7 @@ export default function MyProfile() {
 
       // 🚀 Auto-redirect after choosing technician
       if (role === "technician") {
-        navigate("/technician-dashboard");
+        navigate("/myProfile");
       } else if (role === "client") {
         navigate("/myProfile");
       }
@@ -157,4 +157,5 @@ export default function MyProfile() {
     </div>
   );
 }
+
 
