@@ -1,6 +1,7 @@
 // MyProfile.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config.ts";
 
 export default function MyProfile() {
   const [profile, setProfile] = useState<any>(null);
@@ -17,7 +18,7 @@ export default function MyProfile() {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/me", {
+        const res = await fetch(`${API_URL}/me`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ export default function MyProfile() {
 
     try {
       setSaving(true);
-      const res = await fetch("http://localhost:8000/set-role", {
+      const res = await fetch(`${API_URL}/set-role`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,3 +157,4 @@ export default function MyProfile() {
     </div>
   );
 }
+
