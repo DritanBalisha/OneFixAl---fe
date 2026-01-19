@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config.ts";
 
 interface TechnicianProfile {
   profession: string;
@@ -29,7 +30,7 @@ export default function TechProfiles() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await fetch("http://localhost:8000/technicians");
+        const res = await fetch(`${API_URL}/technicians`);
         if (!res.ok) {
           throw new Error("Failed to fetch technicians");
         }
@@ -111,4 +112,5 @@ export default function TechProfiles() {
     </ul>
   </div>
 );
+
 }
