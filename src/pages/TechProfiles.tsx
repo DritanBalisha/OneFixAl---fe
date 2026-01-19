@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../api/config.ts";
@@ -114,3 +113,4 @@ export default function TechProfiles() {
 );
 
 }
+
