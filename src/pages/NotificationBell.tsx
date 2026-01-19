@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../api/config.ts";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -7,7 +8,7 @@ export default function NotificationBell() {
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!token) return;
-      const res = await fetch("http://localhost:8000/notifications", {
+      const res = await fetch(`${API_URL}/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;
@@ -21,7 +22,7 @@ export default function NotificationBell() {
   }, [token]);
 
   const markAsSeen = async (id: number) => {
-    await fetch(`http://localhost:8000/notifications/${id}/seen`, {
+    await fetch(`${API_URL}/notifications/${id}/seen`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -44,3 +45,4 @@ export default function NotificationBell() {
     </div>
   );
 }
+
