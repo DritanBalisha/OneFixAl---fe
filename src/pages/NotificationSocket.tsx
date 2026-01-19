@@ -8,7 +8,8 @@ export default function NotificationSocket() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (!user?.id) return;
 
-    const ws = new WebSocket(`ws:`${API_URL}/ws?user_id=${user.id}`);
+  const socketBase = API_URL.replace(/^http/, "ws").replace(/\/$/, "");
+  const ws = new WebSocket(`${socketBase}/ws?user_id=${user.id}`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -38,4 +39,5 @@ export default function NotificationSocket() {
     </div>
   );
 }
+
 
