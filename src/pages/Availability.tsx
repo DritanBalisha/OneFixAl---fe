@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../api/config.ts";
@@ -194,4 +193,5 @@ function AvailabilityForm({ onAdd }: { onAdd: (day: number, start: string, end: 
     </div>
   );
 }
+
 
