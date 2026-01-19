@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../api/config.ts";
 
 export default function NotificationSocket() {
   const [message, setMessage] = useState<string | null>(null);
@@ -7,7 +8,7 @@ export default function NotificationSocket() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (!user?.id) return;
 
-    const ws = new WebSocket(`ws://localhost:8000/ws?user_id=${user.id}`);
+    const ws = new WebSocket(`ws:`${API_URL}/ws?user_id=${user.id}`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -37,3 +38,4 @@ export default function NotificationSocket() {
     </div>
   );
 }
+
