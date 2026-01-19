@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config.ts";
 
 const days = [
   { value: 0, label: "Sunday" },
@@ -33,7 +34,7 @@ export default function Availability() {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/availability", {
+        const res = await fetch(`${API_URL}/availability`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -63,7 +64,7 @@ export default function Availability() {
         return;
       }
 
-      const res = await fetch("http://localhost:8000/availability", {
+      const res = await fetch(`${API_URL}/availability`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +104,7 @@ export default function Availability() {
         return;
       }
 
-      const res = await fetch(`http://localhost:8000/availability/${id}`, {
+      const res = await fetch(`${API_URL}/availability/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -193,3 +194,4 @@ function AvailabilityForm({ onAdd }: { onAdd: (day: number, start: string, end: 
     </div>
   );
 }
+
