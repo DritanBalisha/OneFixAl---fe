@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config.ts";
 
 type Technician = {
   id: number;
@@ -35,10 +36,10 @@ export default function TechnicianProfile() {
     const fetchData = async () => {
       try {
         const [techRes, availRes] = await Promise.all([
-          fetch(`http://localhost:8000/users/${id}`, {
+          fetch(``${API_URL}/users/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`http://localhost:8000/availability/${id}`, {
+          fetch(``${API_URL}/availability/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -75,7 +76,7 @@ export default function TechnicianProfile() {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/bookings", {
+      const res = await fetch(`${API_URL}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,3 +147,4 @@ export default function TechnicianProfile() {
     </div>
   );
 }
+
