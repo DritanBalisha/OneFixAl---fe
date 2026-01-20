@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Search, LogOut, User, BookOpen, Settings, Filter, Tool, Zap, Droplet, Monitor } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../api/config";
 
@@ -11,7 +10,7 @@ const ClientHome = () => (
     <div className="bg-blue-600 rounded-2xl p-8 text-white shadow-lg">
       <h1 className="text-3xl font-bold mb-4">What do you need fixed?</h1>
       <div className="relative">
-        <Search className="absolute left-3 top-3 text-gray-400" />
+        <span className="absolute left-3 top-3 text-gray-400">🔍</span>
         <input 
           type="text" 
           placeholder="Search for plumbers, electricians, or developers..." 
@@ -25,14 +24,14 @@ const ClientHome = () => (
       <h2 className="text-xl font-bold mb-4">Categories</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { name: "Plumbing", icon: <Droplet />, color: "bg-blue-100 text-blue-600" },
-          { name: "Electrical", icon: <Zap />, color: "bg-yellow-100 text-yellow-600" },
-          { name: "IT Support", icon: <Monitor />, color: "bg-purple-100 text-purple-600" },
-          { name: "Maintenance", icon: <Tool />, color: "bg-green-100 text-green-600" },
+          { name: "Plumbing", icon: "💧", color: "bg-blue-100 text-blue-600" },
+          { name: "Electrical", icon: "⚡", color: "bg-yellow-100 text-yellow-600" },
+          { name: "IT Support", icon: "💻", color: "bg-purple-100 text-purple-600" },
+          { name: "Maintenance", icon: "🛠️", color: "bg-green-100 text-green-600" },
         ].map((cat) => (
           <div key={cat.name} className={`${cat.color} p-6 rounded-xl flex flex-col items-center cursor-pointer hover:scale-105 transition-transform`}>
-            {cat.icon}
-            <span className="font-semibold mt-2">{cat.name}</span>
+            <span className="text-2xl mb-2">{cat.icon}</span>
+            <span className="font-semibold">{cat.name}</span>
           </div>
         ))}
       </div>
@@ -44,10 +43,12 @@ const ClientHome = () => (
       <div className="grid md:grid-cols-3 gap-6">
         {[1, 2, 3].map((id) => (
           <div key={id} className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div className="h-32 bg-gray-200"></div> {/* Placeholder for Image */}
+            <div className="h-32 bg-gray-200 flex items-center justify-center text-gray-400">
+               <span>📷 Photo</span>
+            </div> 
             <div className="p-4">
               <h3 className="font-bold">John Technician #{id}</h3>
-              <p className="text-sm text-gray-500">Expert Electrician • 5.0 ⭐</p>
+              <p className="text-sm text-gray-500">Expert Professional • 5.0 ⭐</p>
               <div className="mt-4 flex justify-between items-center">
                 <span className="font-bold text-blue-600">$45/hr</span>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">Book Now</button>
@@ -74,7 +75,7 @@ const TechHome = () => (
       <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center justify-between">
         <div>
           <h3 className="text-gray-500 text-sm">Work Status</h3>
-          <p className="text-lg font-bold text-blue-600">Available</p>
+          <p className="text-lg font-bold text-blue-600">Available 🟢</p>
         </div>
         <div className="w-12 h-6 bg-blue-600 rounded-full relative cursor-pointer">
           <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
@@ -106,7 +107,12 @@ export default function Main() {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userData = localStorage.getItem("user");
+    if (!userData) {
+      navigate("/login");
+      return;
+    }
+    const user = JSON.parse(userData);
     if (!user.token) {
       navigate("/login");
     } else {
@@ -128,10 +134,10 @@ export default function Main() {
           
           <div className="hidden md:flex space-x-8 text-gray-600 font-medium">
             <button onClick={() => navigate("/books")} className="flex items-center gap-1 hover:text-blue-600 transition">
-              <BookOpen size={18} /> {role === "technician" ? "My Jobs" : "My Books"}
+              <span>📖</span> {role === "technician" ? "My Jobs" : "My Books"}
             </button>
             <button onClick={() => navigate("/profile")} className="flex items-center gap-1 hover:text-blue-600 transition">
-              <User size={18} /> Profile
+              <span>👤</span> Profile
             </button>
           </div>
 
@@ -139,7 +145,7 @@ export default function Main() {
             onClick={handleLogout}
             className="flex items-center gap-1 text-red-500 font-semibold text-sm hover:bg-red-50 px-3 py-2 rounded-lg transition"
           >
-            <LogOut size={18} /> Logout
+            <span>🚪</span> Logout
           </button>
         </div>
       </nav>
