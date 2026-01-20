@@ -15,10 +15,10 @@ export default function HomePage({ user }: HomePageProps) {
 
         <div className="flex items-center space-x-4">
           <Link 
-            to="/technicians" 
+            to="/myProfile" 
             className="text-gray-700 hover:text-blue-600"
           >
-            Technicians
+            Profile
           </Link>
 
           <Link 
@@ -79,3 +79,4 @@ export default function HomePage({ user }: HomePageProps) {
     </div>
   );
 }
+
