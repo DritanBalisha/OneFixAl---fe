@@ -121,7 +121,7 @@ export default function Main() {
             className="font-black text-2xl text-blue-600 tracking-tighter cursor-pointer" 
             onClick={() => navigate("/")}
           >
-            ONEFIX
+            OneFixAL
           </div>
           
           <div className="hidden md:flex space-x-8 text-gray-600 font-medium">
@@ -171,3 +171,4 @@ export default function Main() {
     </div>
   );
 }
+
