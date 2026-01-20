@@ -108,4 +108,68 @@ export default function Main() {
     const userData = localStorage.getItem("user");
     if (userData) {
       try {
-        const user = JSON.parse
+        const user = JSON.parse(userData);
+        if (user.token) {
+          setIsLoggedIn(true);
+          setRole(user.role);
+        }
+      } catch (e) { console.error(e); }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setRole(null);
+    navigate("/login");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div 
+            className="font-black text-2xl text-blue-600 tracking-tighter cursor-pointer" 
+            onClick={() => navigate("/")}
+          >
+            ONEFIX
+          </div>
+          
+          <div className="flex items-center gap-6">
+            {isLoggedIn ? (
+              <>
+                <div className="hidden md:flex space-x-6 text-gray-600 font-medium">
+                  <button onClick={() => navigate("/books")} className="hover:text-blue-600 flex items-center gap-1 transition">
+                    <span>📖</span> {role === "technician" ? "Work History" : "My Books"}
+                  </button>
+                  <button onClick={() => navigate("/profile")} className="hover:text-blue-600 flex items-center gap-1 transition">
+                    <span>👤</span> Profile
+                  </button>
+                </div>
+                <button 
+                  onClick={handleLogout}
+                  className="text-red-600 font-bold text-sm bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition"
+                >
+                  Logout 🚪
+                </button>
+              </>
+            ) : (
+              <div className="space-x-3">
+                <button onClick={() => navigate("/login")} className="text-blue-600 font-bold text-sm px-4 py-2 hover:bg-blue-50 rounded-lg">
+                  Login
+                </button>
+                <button onClick={() => navigate("/signup")} className="bg-blue-600 text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-blue-700">
+                  Sign Up
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-6xl mx-auto p-4 md:p-8">
+        {role === "technician" ? <TechHome /> : <ClientHome />}
+      </div>
+    </div>
+  );
+}
