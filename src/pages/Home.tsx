@@ -33,14 +33,14 @@ export default function HomePage({ user }: HomePageProps) {
             to="/techprofiles" 
             className="text-gray-700 hover:text-blue-600"
           >
-            Technicians
+            Book a Tech
           </Link>
 
           <Link 
             to="/myProfile" 
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            Book a Tech
+            Profile
           </Link>
 
           {/* Logic: Check if user data exists in storage or props */}
@@ -93,4 +93,5 @@ export default function HomePage({ user }: HomePageProps) {
     </div>
   );
 }
+
 
