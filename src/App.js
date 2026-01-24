@@ -4,6 +4,7 @@ import Login from "./pages/Login.tsx";
 import Profile from "./pages/Profile.tsx"
 // import ClientDashboard from "./pages/ClientDashboard.tsx"
 import TPB from "./pages/TPB.tsx"
+import Home from "./pages/Home.tsx"
 import MyProfile from "./pages/MyProfile.tsx"
 import TechProfiles from "./pages/TechProfiles.tsx";
 import MainPage from "./pages/Main.tsx";
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/availability" element={<Avalability />} />
+        <Route path="/client-dashboard" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/myBookings" element={<MyBookings />} />
@@ -33,5 +35,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
