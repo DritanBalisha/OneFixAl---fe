@@ -22,7 +22,7 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/availability" element={<Avalability />} />
-        <Route path="/client-dashboard" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/myBookings" element={<MyBookings />} />
@@ -39,4 +39,5 @@ function App() {
 
 
 export default App;
+
 
