@@ -18,9 +18,9 @@ export default function HomePage({ user }: HomePageProps) {
         
         // 2. Redirect based on role
         if (parsedUser.role === "technician") {
-          navigate("/tech-dashboard"); // Change this to your actual tech route
+          navigate("/home"); // Change this to your actual tech route
         } else if (parsedUser.role === "client") {
-          navigate("/client-dashboard"); // Change this to your actual client route
+          navigate("/home"); // Change this to your actual client route
         }
       } catch (e) {
         console.error("Error parsing user for redirect", e);
@@ -103,3 +103,4 @@ export default function HomePage({ user }: HomePageProps) {
     </div>
   );
 }
+
