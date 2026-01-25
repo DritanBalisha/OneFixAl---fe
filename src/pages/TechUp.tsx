@@ -1,6 +1,7 @@
 // TechDash.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config.ts";
 
 export default function TechnicianProfileForm() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function TechnicianProfileForm() {
       if (!token) return;
 
       try {
-        const res = await fetch("http://localhost:8000/technician/profile", {
+        const res = await fetch(`${API_URL}/technician/profile`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -55,7 +56,7 @@ export default function TechnicianProfileForm() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:8000/technician/profile", {
+      const res = await fetch(`${API_URL}/technician/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +76,7 @@ export default function TechnicianProfileForm() {
 
 
       await res.json();
-      navigate("/myProfile"); // ✅ redirect back
+      navigate("/myProfile");
     } catch (err) {
       console.error(err);
     }
@@ -128,3 +129,4 @@ export default function TechnicianProfileForm() {
     </form>
   );
 }
+
