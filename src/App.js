@@ -12,7 +12,7 @@ import Avalability from "./pages/Availability.tsx";
 import MyBookings from "./pages/MyBookings.tsx";
 import NotificationBell from "./pages/NotificationBell.tsx";
 import NotificationSocket from "./pages/NotificationSocket.tsx";
-// import TechBookings from "./pages/TechBookings.tsx"
+import TPU from "./pages/TechUp.tsx"
 
 function App() {
   return (
@@ -28,6 +28,7 @@ function App() {
         <Route path="/myBookings" element={<MyBookings />} />
         <Route path="/technician/:id" element={<TPB />} />
         <Route path="/myProfile" element={<MyProfile />} />
+        <Route path="/profileupdatetech" element={<TPU />} />
         <Route path="/techprofiles" element={<TechProfiles />} />
         <Route path="/notifyBell" element={<NotificationBell />} />
 
@@ -38,3 +39,4 @@ function App() {
 
 
 export default App;
+
