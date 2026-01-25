@@ -148,7 +148,7 @@ export default function MyProfile() {
           )}
           <button
             className="bg-yellow-500 text-white mt-4 px-4 py-2 rounded"
-            onClick={() => navigate("/technician-dashboard")}
+            onClick={() => navigate("/profileupdatetech")}
           >
             Update Profile
           </button>
@@ -157,5 +157,6 @@ export default function MyProfile() {
     </div>
   );
 }
+
 
 
