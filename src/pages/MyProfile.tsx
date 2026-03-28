@@ -89,7 +89,6 @@ export default function MyProfile() {
       {/* NAVBAR */}
       <nav className="w-full bg-white shadow-sm py-4 px-6">
         <div className="flex justify-between items-center">
-          {/* Logo */}
           <h1
             className="text-2xl font-semibold text-blue-600 cursor-pointer"
             onClick={() => navigate("/")}
@@ -128,21 +127,9 @@ export default function MyProfile() {
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label="Toggle menu"
           >
-            <span
-              className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${
-                menuOpen ? "rotate-45 translate-y-2" : ""
-              }`}
-            />
-            <span
-              className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ${
-                menuOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${
-                menuOpen ? "-rotate-45 -translate-y-2" : ""
-              }`}
-            />
+            <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </button>
         </div>
 
@@ -198,6 +185,7 @@ export default function MyProfile() {
             <p><b>Phone:</b> {profile.phone || "N/A"}</p>
             <p><b>Role:</b> {profile.role || "Not set"}</p>
 
+            {/* Role selection */}
             {!profile.role && (
               <div className="mt-4">
                 <p className="mb-2 font-medium">Select your role:</p>
@@ -220,43 +208,55 @@ export default function MyProfile() {
               </div>
             )}
 
-            {profile.role === "technician" && profile.technicianProfile && (
+            {/* Technician section — always shown when role is technician */}
+            {profile.role === "technician" && (
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-2">Technician Details</h3>
-                {profile.technicianProfile.profession && (
-                  <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
-                )}
-                {profile.technicianProfile.bio && (
-                  <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
-                )}
-                {profile.technicianProfile.profile_picture && (
-                  <img
-                    src={profile.technicianProfile.profile_picture}
-                    alt="Profile"
-                    className="w-32 rounded mt-2"
-                  />
-                )}
-                {profile.technicianProfile.certificate && (
-                  <p className="mt-1">
-                    <b>Certificate:</b>{" "}
-                    <a
-                      href={profile.technicianProfile.certificate}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View
-                    </a>
+
+                {profile.technicianProfile ? (
+                  <>
+                    {profile.technicianProfile.profession && (
+                      <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
+                    )}
+                    {profile.technicianProfile.bio && (
+                      <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
+                    )}
+                    {profile.technicianProfile.profile_picture && (
+                      <img
+                        src={profile.technicianProfile.profile_picture}
+                        alt="Profile"
+                        className="w-32 rounded mt-2"
+                      />
+                    )}
+                    {profile.technicianProfile.certificate && (
+                      <p className="mt-1">
+                        <b>Certificate:</b>{" "}
+                        <a
+                          href={profile.technicianProfile.certificate}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          View
+                        </a>
+                      </p>
+                    )}
+                    {profile.technicianProfile.experience && (
+                      <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400 mb-2">
+                    No details yet. Complete your profile to start receiving bookings.
                   </p>
                 )}
-                {profile.technicianProfile.experience && (
-                  <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
-                )}
+
+                {/* Always visible for any technician */}
                 <button
-                  className="bg-yellow-500 text-white mt-4 px-4 py-2 rounded"
+                  className="bg-yellow-500 text-white mt-4 px-4 py-2 rounded hover:bg-yellow-600 transition"
                   onClick={() => navigate("/profileupdatetech")}
                 >
-                  Update Profile
+                  {profile.technicianProfile ? "Update Profile" : "Complete Profile"}
                 </button>
               </div>
             )}
@@ -265,7 +265,7 @@ export default function MyProfile() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-white shadow-inner py-6 text-center text-gray-500">
+      <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
         © {new Date().getFullYear()} OneFixAL – All rights reserved.
       </footer>
     </div>
