@@ -102,10 +102,10 @@ export default function MyProfile() {
               Book a Tech
             </Link>
             <Link
-              to="/myProfile"
+              to="/"
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
-              Profile
+              Home
             </Link>
             {isLoggedIn ? (
               <button
