@@ -13,6 +13,7 @@ import MyBookings from "./pages/MyBookings.tsx";
 import NotificationBell from "./pages/NotificationBell.tsx";
 import NotificationSocket from "./pages/NotificationSocket.tsx";
 import TPU from "./pages/TechUp.tsx"
+import Payment from "./pages/Payment.tsx"
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/profileupdatetech" element={<TPU />} />
         <Route path="/techprofiles" element={<TechProfiles />} />
         <Route path="/notifyBell" element={<NotificationBell />} />
+        <Route path="/payment" element={<Payment />} />
 
       </Routes>
     </Router>
