@@ -26,7 +26,6 @@ export default function MyProfile() {
         navigate("/login");
         return;
       }
-
       try {
         const res = await fetch(`${API_URL}/me`, {
           headers: {
@@ -34,7 +33,6 @@ export default function MyProfile() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         if (res.ok) {
           const updatedUser = await res.json();
           setProfile(updatedUser);
@@ -55,7 +53,6 @@ export default function MyProfile() {
   const handleSetRole = async (role: string) => {
     const token = localStorage.getItem("token");
     if (!token) return;
-
     try {
       setSaving(true);
       const res = await fetch(`${API_URL}/set-role`, {
@@ -66,13 +63,10 @@ export default function MyProfile() {
         },
         body: JSON.stringify({ role }),
       });
-
       if (!res.ok) throw new Error("Failed to update role");
-
       const updatedUser = await res.json();
       setProfile(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-
       if (role === "technician" || role === "client") {
         navigate("/myProfile");
       }
@@ -86,6 +80,7 @@ export default function MyProfile() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+
       {/* NAVBAR */}
       <nav className="w-full bg-white shadow-sm py-4 px-6">
         <div className="flex justify-between items-center">
@@ -185,7 +180,7 @@ export default function MyProfile() {
             <p><b>Phone:</b> {profile.phone || "N/A"}</p>
             <p><b>Role:</b> {profile.role || "Not set"}</p>
 
-            {/* Role selection */}
+            {/* Role selection — only shown if no role yet */}
             {!profile.role && (
               <div className="mt-4">
                 <p className="mb-2 font-medium">Select your role:</p>
@@ -208,76 +203,81 @@ export default function MyProfile() {
               </div>
             )}
 
-            {/* Technician section — always shown when role is technician */}
-{profile.role === "technician" && (
-  <div className="mt-6">
-    <h3 className="text-lg font-semibold mb-2">Technician Details</h3>
+            {/* ── TECHNICIAN SECTION ────────────────────────────── */}
+            {profile.role === "technician" && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-3">Technician Details</h3>
 
-    {profile.technicianProfile ? (
-      <>
-        {profile.technicianProfile.profession && (
-          <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
-        )}
-        {profile.technicianProfile.bio && (
-          <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
-        )}
-        {profile.technicianProfile.profile_picture && (
-          <img
-            src={profile.technicianProfile.profile_picture}
-            alt="Profile"
-            className="w-32 rounded mt-2"
-          />
-        )}
-        {profile.technicianProfile.certificate && (
-          <p className="mt-1">
-            <b>Certificate:</b>{" "}
-            
-              href={profile.technicianProfile.certificate}
-              target="_blank"
-              rel="noreferrer"
-              className="text-blue-600 underline"
-            >
-              View
-            </a>
-          </p>
-        )}
-        {profile.technicianProfile.experience && (
-          <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
-        )}
-      </>
-    ) : (
-      <p className="text-sm text-gray-400 mb-2">
-        No details yet. Complete your profile to start receiving bookings.
-      </p>
-    )}
+                {profile.technicianProfile ? (
+                  <div className="space-y-1 mb-4">
+                    {profile.technicianProfile.profession && (
+                      <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
+                    )}
+                    {profile.technicianProfile.bio && (
+                      <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
+                    )}
+                    {profile.technicianProfile.experience && (
+                      <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
+                    )}
+                    {profile.technicianProfile.profile_picture && (
+                      <img
+                        src={profile.technicianProfile.profile_picture}
+                        alt="Profile"
+                        className="w-32 rounded mt-2"
+                      />
+                    )}
+                    {profile.technicianProfile.certificate && (
+                      <p className="mt-1">
+                        <b>Certificate:</b>{" "}
+                        {/* ✅ fixed: <a tag was missing */}
+                        
+                          href={profile.technicianProfile.certificate}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          View
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 mb-4">
+                    No details yet. Complete your profile to start receiving bookings.
+                  </p>
+                )}
 
-    {/* Action buttons */}
-    <div className="mt-4 flex flex-col gap-3">
-      <button
-        className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-        onClick={() => navigate("/profileupdatetech")}
-      >
-        {profile.technicianProfile ? "✏️ Update Profile" : "✏️ Complete Profile"}
-      </button>
+                {/* Action buttons */}
+                <div className="flex flex-col gap-3">
+                  <button
+                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                    onClick={() => navigate("/profileupdatetech")}
+                  >
+                    {profile.technicianProfile ? "✏️ Update Profile" : "✏️ Complete Profile"}
+                  </button>
 
-      {/* ✅ NEW — only show if profile is complete */}
-      {profile.technicianProfile && (
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-          onClick={() => navigate("/availability")}
-        >
-          🗓️ Manage Availability
-        </button>
-      )}
-    </div>
-  </div>
-)}
+                  {/* ✅ Only shown after profile is completed */}
+                  {profile.technicianProfile && (
+                    <button
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                      onClick={() => navigate("/availability")}
+                    >
+                      🗓️ Manage Availability
+                    </button>
+                  )}
+                </div>
+              </div> {/* ✅ closes technician section div */}
+            )}
+
+          </div> {/* ✅ closes profile card div */}
+        )}
       </main>
 
       {/* FOOTER */}
       <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
         © {new Date().getFullYear()} OneFixAL – All rights reserved.
       </footer>
+
     </div>
   );
 }
