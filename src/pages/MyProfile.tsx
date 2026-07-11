@@ -226,20 +226,19 @@ export default function MyProfile() {
                         className="w-32 rounded mt-2"
                       />
                     )}
-                    {profile.technicianProfile.certificate && (
-                      <p className="mt-1">
-                        <b>Certificate:</b>{" "}
-                        {/* ✅ fixed: <a tag was missing */}
-                        
-                          href={profile.technicianProfile.certificate}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          View
-                        </a>
-                      </p>
-                    )}
+{profile.technicianProfile.certificate && (
+  <div className="mt-1">
+    <b>Certificate:</b>{" "}
+    
+      href={profile.technicianProfile.certificate}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 underline"
+    >
+      View
+    </a>
+  </div>
+)}
                   </div>
                 ) : (
                   <p className="text-sm text-gray-400 mb-4">
