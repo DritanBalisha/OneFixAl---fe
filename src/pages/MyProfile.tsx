@@ -252,12 +252,33 @@ export default function MyProfile() {
                 )}
 
                 {/* Always visible for any technician */}
-                <button
-                  className="bg-yellow-500 text-white mt-4 px-4 py-2 rounded hover:bg-yellow-600 transition"
-                  onClick={() => navigate("/profileupdatetech")}
-                >
-                  {profile.technicianProfile ? "Update Profile" : "Complete Profile"}
-                </button>
+                {/* Action buttons */}
+<div className="mt-4 flex flex-col gap-3">
+  <button
+    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+    onClick={() => navigate("/profileupdatetech")}
+  >
+    {profile.technicianProfile ? "✏️ Update Profile" : "✏️ Complete Profile"}
+  </button>
+
+  {profile.technicianProfile && (
+    <button
+      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+      onClick={() => navigate("/availability")}
+    >
+      🗓️ Manage Availability
+    </button>
+  )}
+
+  {profile.technicianProfile && (
+    <button
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+      onClick={() => navigate("/myBookings")}
+    >
+      📋 My Bookings
+    </button>
+  )}
+</div>
               </div>
             )}
           </div>
