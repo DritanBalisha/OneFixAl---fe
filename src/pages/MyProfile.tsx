@@ -209,59 +209,69 @@ export default function MyProfile() {
             )}
 
             {/* Technician section — always shown when role is technician */}
-            {profile.role === "technician" && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Technician Details</h3>
+{profile.role === "technician" && (
+  <div className="mt-6">
+    <h3 className="text-lg font-semibold mb-2">Technician Details</h3>
 
-                {profile.technicianProfile ? (
-                  <>
-                    {profile.technicianProfile.profession && (
-                      <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
-                    )}
-                    {profile.technicianProfile.bio && (
-                      <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
-                    )}
-                    {profile.technicianProfile.profile_picture && (
-                      <img
-                        src={profile.technicianProfile.profile_picture}
-                        alt="Profile"
-                        className="w-32 rounded mt-2"
-                      />
-                    )}
-                    {profile.technicianProfile.certificate && (
-                      <p className="mt-1">
-                        <b>Certificate:</b>{" "}
-                        <a
-                          href={profile.technicianProfile.certificate}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          View
-                        </a>
-                      </p>
-                    )}
-                    {profile.technicianProfile.experience && (
-                      <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-gray-400 mb-2">
-                    No details yet. Complete your profile to start receiving bookings.
-                  </p>
-                )}
-
-                {/* Always visible for any technician */}
-                <button
-                  className="bg-yellow-500 text-white mt-4 px-4 py-2 rounded hover:bg-yellow-600 transition"
-                  onClick={() => navigate("/profileupdatetech")}
-                >
-                  {profile.technicianProfile ? "Update Profile" : "Complete Profile"}
-                </button>
-              </div>
-            )}
-          </div>
+    {profile.technicianProfile ? (
+      <>
+        {profile.technicianProfile.profession && (
+          <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
         )}
+        {profile.technicianProfile.bio && (
+          <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
+        )}
+        {profile.technicianProfile.profile_picture && (
+          <img
+            src={profile.technicianProfile.profile_picture}
+            alt="Profile"
+            className="w-32 rounded mt-2"
+          />
+        )}
+        {profile.technicianProfile.certificate && (
+          <p className="mt-1">
+            <b>Certificate:</b>{" "}
+            
+              href={profile.technicianProfile.certificate}
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-600 underline"
+            >
+              View
+            </a>
+          </p>
+        )}
+        {profile.technicianProfile.experience && (
+          <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
+        )}
+      </>
+    ) : (
+      <p className="text-sm text-gray-400 mb-2">
+        No details yet. Complete your profile to start receiving bookings.
+      </p>
+    )}
+
+    {/* Action buttons */}
+    <div className="mt-4 flex flex-col gap-3">
+      <button
+        className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+        onClick={() => navigate("/profileupdatetech")}
+      >
+        {profile.technicianProfile ? "✏️ Update Profile" : "✏️ Complete Profile"}
+      </button>
+
+      {/* ✅ NEW — only show if profile is complete */}
+      {profile.technicianProfile && (
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+          onClick={() => navigate("/availability")}
+        >
+          🗓️ Manage Availability
+        </button>
+      )}
+    </div>
+  </div>
+)}
       </main>
 
       {/* FOOTER */}
