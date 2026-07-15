@@ -10,20 +10,26 @@ type Booking = {
   timeslot: string;
   description: string;
   status: string;
+  payment_status: string;
+  job_price: number;
+  booking_fee: number;
+  platform_fee: number;
+  total_amount: number;
   created_at: string;
-  technician_name?: string;
-  customer_name?: string;
+  technician?: { id: number; name: string; email: string; phone: string };
+  customer?:   { id: number; name: string; email: string; phone: string };
 };
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]   = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const token = localStorage.getItem("token");
-  const isLoggedIn = !!localStorage.getItem("user");
+  const user      = JSON.parse(localStorage.getItem("user") || "{}");
+  const token     = localStorage.getItem("token");
+  const isLoggedIn = !!token;
+  const isTech    = user.role === "technician";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -39,8 +45,7 @@ export default function MyBookings() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to load bookings");
-        const data = await res.json();
-        setBookings(data);
+        setBookings(await res.json());
       } catch (err) {
         console.error("Error fetching bookings:", err);
       } finally {
@@ -50,7 +55,7 @@ export default function MyBookings() {
     fetchBookings();
   }, []);
 
-  const updateBookingStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: number, status: string) => {
     try {
       const res = await fetch(`${API_URL}/bookings/${id}/status`, {
         method: "PUT",
@@ -60,30 +65,31 @@ export default function MyBookings() {
         },
         body: JSON.stringify({ status }),
       });
-
-      if (!res.ok) throw new Error("Failed to update status");
-
-      const updated = await res.json();
+      if (!res.ok) throw new Error("Failed to update");
+      const data = await res.json();
 
       if (status === "cancelled") {
         setBookings((prev) => prev.filter((b) => b.id !== id));
       } else {
-        setBookings((prev) =>
-          prev.map((b) => (b.id === id ? updated.booking : b))
-        );
+        setBookings((prev) => prev.map((b) => b.id === id ? data.booking : b));
       }
-
-      alert(`Booking ${status} ✅`);
     } catch (err) {
-      console.error("Status update error:", err);
-      alert("Failed to update status ❌");
+      alert("Failed to update booking ❌");
     }
   };
 
   const statusStyle = (status: string) => {
-    if (status === "confirmed") return "text-green-600 bg-green-50 border border-green-200";
-    if (status === "cancelled") return "text-red-600 bg-red-50 border border-red-200";
-    return "text-yellow-600 bg-yellow-50 border border-yellow-200";
+    if (status === "confirmed")   return "text-green-700 bg-green-50 border-green-200";
+    if (status === "cancelled")   return "text-red-700 bg-red-50 border-red-200";
+    if (status === "completed")   return "text-blue-700 bg-blue-50 border-blue-200";
+    if (status === "in_progress") return "text-purple-700 bg-purple-50 border-purple-200";
+    return "text-yellow-700 bg-yellow-50 border-yellow-200";
+  };
+
+  const paymentStyle = (status: string) => {
+    if (status === "fully_paid")    return "text-green-600";
+    if (status === "deposit_paid")  return "text-blue-600";
+    return "text-red-500";
   };
 
   return (
@@ -91,82 +97,34 @@ export default function MyBookings() {
       {/* NAVBAR */}
       <nav className="w-full bg-white shadow-sm py-4 px-6">
         <div className="flex justify-between items-center">
-          <h1
-            className="text-2xl font-semibold text-blue-600 cursor-pointer"
-            onClick={() => navigate("/")}
-          >
+          <h1 className="text-2xl font-semibold text-blue-600 cursor-pointer" onClick={() => navigate("/")}>
             OneFixAL
           </h1>
-
-          {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/techprofiles" className="text-gray-700 hover:text-blue-600">
-              Book a Tech
-            </Link>
-            <Link
-              to="/myProfile"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Profile
-            </Link>
+            <Link to="/techprofiles" className="text-gray-700 hover:text-blue-600">Book a Tech</Link>
+            <Link to="/myProfile" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Profile</Link>
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="text-red-500 font-medium hover:bg-red-50 px-3 py-2 rounded-md transition"
-              >
+              <button onClick={handleLogout} className="text-red-500 font-medium hover:bg-red-50 px-3 py-2 rounded-md transition">
                 Logout 🚪
               </button>
             ) : (
-              <Link to="/login" className="text-blue-600 font-medium hover:underline">
-                Login
-              </Link>
+              <Link to="/login" className="text-blue-600 font-medium hover:underline">Login</Link>
             )}
           </div>
-
-          {/* Mobile Hamburger */}
-          <button
-            className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5 focus:outline-none"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Toggle menu"
-          >
+          <button className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5" onClick={() => setMenuOpen(p => !p)}>
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </button>
         </div>
-
-        {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden mt-4 flex flex-col space-y-3 border-t pt-4">
-            <Link
-              to="/techprofiles"
-              className="text-gray-700 hover:text-blue-600 py-1"
-              onClick={() => setMenuOpen(false)}
-            >
-              Book a Tech
-            </Link>
-            <Link
-              to="/myProfile"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-center"
-              onClick={() => setMenuOpen(false)}
-            >
-              Profile
-            </Link>
+            <Link to="/techprofiles" className="text-gray-700 py-1" onClick={() => setMenuOpen(false)}>Book a Tech</Link>
+            <Link to="/myProfile" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center" onClick={() => setMenuOpen(false)}>Profile</Link>
             {isLoggedIn ? (
-              <button
-                onClick={() => { setMenuOpen(false); handleLogout(); }}
-                className="text-red-500 font-medium hover:bg-red-50 px-3 py-2 rounded-md transition text-left"
-              >
-                Logout 🚪
-              </button>
+              <button onClick={() => { setMenuOpen(false); handleLogout(); }} className="text-red-500 text-left px-3 py-2">Logout 🚪</button>
             ) : (
-              <Link
-                to="/login"
-                className="text-blue-600 font-medium hover:underline py-1"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
+              <Link to="/login" className="text-blue-600 py-1" onClick={() => setMenuOpen(false)}>Login</Link>
             )}
           </div>
         )}
@@ -176,95 +134,128 @@ export default function MyBookings() {
       <main className="flex-1 px-4 py-10 max-w-4xl mx-auto w-full">
         <h2 className="text-2xl font-semibold text-gray-800 mb-1">My Bookings</h2>
         <p className="text-sm text-gray-500 mb-6">
-          {user.role === "technician"
-            ? "Jobs that clients have booked with you."
-            : "Your scheduled appointments with technicians."}
+          {isTech ? "Jobs clients have booked with you." : "Your appointments with technicians."}
         </p>
 
         {loading ? (
           <p className="text-gray-400 text-center py-16 animate-pulse">Loading bookings...</p>
         ) : bookings.length === 0 ? (
-          <p className="text-gray-400 text-center py-16">No bookings found.</p>
+          <p className="text-gray-400 text-center py-16">No bookings yet.</p>
         ) : (
           <div className="space-y-4">
             {bookings.map((b) => (
-              <div
-                key={b.id}
-                className="bg-white border border-gray-200 rounded-xl shadow-sm p-5"
-              >
-                {/* Top row: date + status badge */}
-                <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
-                  <p className="text-sm text-gray-500">
-                    📅 {new Date(b.timeslot).toLocaleString()}
-                  </p>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${statusStyle(b.status)}`}>
+              <div key={b.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+
+                {/* Top row: status + payment */}
+                <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize border ${statusStyle(b.status)}`}>
                     {b.status}
+                  </span>
+                  <span className={`text-xs font-medium ${paymentStyle(b.payment_status)}`}>
+                    💳 {b.payment_status?.replace("_", " ") || "unpaid"}
                   </span>
                 </div>
 
                 {/* Person info */}
-                <div className="text-sm text-gray-700 mb-3">
-                  {user.role === "client" && (
-                    <p><span className="font-medium">Technician:</span> {b.technician_name || b.technician_id}</p>
+                <div className="text-sm text-gray-700 mb-3 space-y-0.5">
+                  {!isTech && b.technician && (
+                    <>
+                      <p><span className="font-medium">Technician:</span> {b.technician.name}</p>
+                      <p><span className="font-medium">Phone:</span> {b.technician.phone}</p>
+                    </>
                   )}
-                  {user.role === "technician" && (
-                    <p><span className="font-medium">Client:</span> {b.customer_name || b.customer_id}</p>
+                  {isTech && b.customer && (
+                    <>
+                      <p><span className="font-medium">Client:</span> {b.customer.name}</p>
+                      <p><span className="font-medium">Phone:</span> {b.customer.phone}</p>
+                    </>
                   )}
                 </div>
 
-                {/* Problem description */}
+                {/* Description */}
                 {b.description && (
                   <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-lg px-4 py-3 mb-4">
-                    <p className="text-xs font-semibold text-blue-600 mb-1">Problem Description</p>
-                    <p className="text-gray-700 text-sm italic">{b.description}</p>
+                    <p className="text-xs font-semibold text-blue-600 mb-1">Problem</p>
+                    <p className="text-gray-700 text-sm">{b.description}</p>
+                  </div>
+                )}
+
+                {/* ✅ Fee breakdown */}
+                {b.job_price > 0 && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-sm space-y-1">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Job Price</span>
+                      <span>{b.job_price?.toLocaleString()} LEK</span>
+                    </div>
+                    <div className="flex justify-between text-blue-600">
+                      <span>Booking Deposit (10%)</span>
+                      <span>{b.booking_fee?.toLocaleString()} LEK</span>
+                    </div>
+                    <div className="flex justify-between text-gray-400 text-xs">
+                      <span>Platform Fee (2%)</span>
+                      <span>{b.platform_fee?.toLocaleString()} LEK</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-1 mt-1 flex justify-between font-semibold text-gray-800">
+                      <span>Total</span>
+                      <span>{b.total_amount?.toLocaleString()} LEK</span>
+                    </div>
                   </div>
                 )}
 
                 {/* Action buttons */}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2">
                   {b.status === "pending" && (
                     <>
-                      {user.role === "technician" && (
+                      {isTech && (
                         <button
-                          onClick={() => updateBookingStatus(b.id, "confirmed")}
+                          onClick={() => updateStatus(b.id, "confirmed")}
                           className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
                         >
-                          Accept Job
+                          ✅ Accept Job
                         </button>
                       )}
                       <button
-                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        onClick={() => updateStatus(b.id, "cancelled")}
                         className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
                       >
-                        Cancel
+                        ❌ Cancel
                       </button>
                     </>
                   )}
 
-                  {b.status === "confirmed" && user.role === "technician" && (
+                  {b.status === "confirmed" && isTech && (
                     <>
                       <button
-                        onClick={() => alert("💰 Notify client to proceed with payment")}
-                        className="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                        onClick={() => updateStatus(b.id, "in_progress")}
+                        className="bg-purple-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-purple-600 transition"
                       >
-                        Notify Client for Payment
+                        🔧 Mark In Progress
                       </button>
                       <button
-                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        onClick={() => updateStatus(b.id, "cancelled")}
                         className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
                       >
-                        Cancel Job
+                        ❌ Cancel Job
                       </button>
                     </>
                   )}
+
+                  {b.status === "in_progress" && isTech && (
+                    <button
+                      onClick={() => updateStatus(b.id, "completed")}
+                      className="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                    >
+                      🏁 Mark Completed
+                    </button>
+                  )}
                 </div>
+
               </div>
             ))}
           </div>
         )}
       </main>
 
-      {/* FOOTER */}
       <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
         © {new Date().getFullYear()} OneFixAL – All rights reserved.
       </footer>
