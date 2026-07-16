@@ -25,7 +25,6 @@ export default function TechnicianProfile() {
   const [technician, setTechnician] = useState<Technician | null>(null);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [description, setDescription] = useState("");
-  const [jobPrice, setJobPrice] = useState<number>(0);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
@@ -34,11 +33,6 @@ export default function TechnicianProfile() {
   const navigate = useNavigate();
 
   const isLoggedIn = !!localStorage.getItem("user");
-
-  // ── Fee calculations (live preview) ─────────────────────────
-  const bookingFee  = Math.round((jobPrice * 10) / 100); // 10% deposit
-  const platformFee = Math.round((jobPrice * 2) / 100);  // 2% OneFixAL fee
-  const totalAmount = jobPrice;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -99,7 +93,6 @@ export default function TechnicianProfile() {
           technician_id:   Number(id),
           availability_id: selectedSlot,
           description:     description,
-          job_price:       jobPrice,
           status:          "pending",
         }),
       });
@@ -207,47 +200,7 @@ export default function TechnicianProfile() {
                 />
               </div>
 
-              {/* Job price */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estimated job price (LEK)
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  placeholder="e.g. 3000"
-                  value={jobPrice || ""}
-                  onChange={(e) => setJobPrice(Number(e.target.value))}
-                />
-              </div>
-
-              {/* ✅ Fee breakdown — live preview */}
-              {jobPrice > 0 && (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm space-y-1.5">
-                  <p className="font-semibold text-gray-700 mb-2">Fee Breakdown</p>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Job Price</span>
-                    <span>{jobPrice.toLocaleString()} LEK</span>
-                  </div>
-                  <div className="flex justify-between text-blue-600">
-                    <span>Booking Deposit (10%)</span>
-                    <span>{bookingFee.toLocaleString()} LEK</span>
-                  </div>
-                  <div className="flex justify-between text-gray-400 text-xs">
-                    <span>Platform Fee (2% — OneFixAL)</span>
-                    <span>{platformFee.toLocaleString()} LEK</span>
-                  </div>
-                  <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-semibold text-gray-800">
-                    <span>Total Job Cost</span>
-                    <span>{totalAmount.toLocaleString()} LEK</span>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Pay {bookingFee.toLocaleString()} LEK deposit to confirm. Remainder due after job completion.
-                  </p>
-                </div>
-              )}
-
+             
               {/* Time slots */}
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Select a Time Slot</h4>
