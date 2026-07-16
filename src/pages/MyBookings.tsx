@@ -281,7 +281,7 @@ export default function MyBookings() {
                     </button>
                   )}
 
-                  {/* Cancel — both sides, on pending or confirmed only */}
+                                  {/* Cancel — both sides, on pending or confirmed only */}
                   {["pending", "confirmed"].includes(b.status) && (
                     <button
                       onClick={() => updateStatus(b.id, "cancelled")}
@@ -290,11 +290,10 @@ export default function MyBookings() {
                       ❌ Cancel
                     </button>
                   )}
-
                 </div>
-              </div> {/* ✅ closes booking card */}
+              </div>
             ))}
-          </div> {/* ✅ closes space-y-4 */}
+          </div>
         )}
       </main>
 
