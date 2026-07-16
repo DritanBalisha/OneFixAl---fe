@@ -78,7 +78,6 @@ export default function TechnicianProfile() {
 
     if (!token || !user?.id) { navigate("/login"); return; }
     if (!description.trim()) { setError("Please describe your problem."); return; }
-    if (!jobPrice || jobPrice <= 0) { setError("Please enter the estimated job price."); return; }
     if (!selectedSlot) { setError("Please select an available time slot."); return; }
 
     setBooking(true);
