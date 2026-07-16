@@ -101,7 +101,6 @@ export default function TechnicianProfile() {
 
       setSuccess("✅ Booking sent! You'll be notified once the technician confirms.");
       setDescription("");
-      setJobPrice(0);
       setSelectedSlot(null);
 
       // Mark slot as booked in UI
