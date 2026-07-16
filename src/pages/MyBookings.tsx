@@ -26,10 +26,10 @@ export default function MyBookings() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const user      = JSON.parse(localStorage.getItem("user") || "{}");
-  const token     = localStorage.getItem("token");
+  const user       = JSON.parse(localStorage.getItem("user") || "{}");
+  const token      = localStorage.getItem("token");
   const isLoggedIn = !!token;
-  const isTech    = user.role === "technician";
+  const isTech     = user.role === "technician";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -67,7 +67,6 @@ export default function MyBookings() {
       });
       if (!res.ok) throw new Error("Failed to update");
       const data = await res.json();
-
       if (status === "cancelled") {
         setBookings((prev) => prev.filter((b) => b.id !== id));
       } else {
@@ -83,17 +82,19 @@ export default function MyBookings() {
     if (status === "cancelled")   return "text-red-700 bg-red-50 border-red-200";
     if (status === "completed")   return "text-blue-700 bg-blue-50 border-blue-200";
     if (status === "in_progress") return "text-purple-700 bg-purple-50 border-purple-200";
+    if (status === "price_set")   return "text-orange-700 bg-orange-50 border-orange-200";
     return "text-yellow-700 bg-yellow-50 border-yellow-200";
   };
 
   const paymentStyle = (status: string) => {
-    if (status === "fully_paid")    return "text-green-600";
-    if (status === "deposit_paid")  return "text-blue-600";
+    if (status === "fully_paid")   return "text-green-600";
+    if (status === "deposit_paid") return "text-blue-600";
     return "text-red-500";
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+
       {/* NAVBAR */}
       <nav className="w-full bg-white shadow-sm py-4 px-6">
         <div className="flex justify-between items-center">
@@ -111,7 +112,10 @@ export default function MyBookings() {
               <Link to="/login" className="text-blue-600 font-medium hover:underline">Login</Link>
             )}
           </div>
-          <button className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5" onClick={() => setMenuOpen(p => !p)}>
+          <button
+            className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5"
+            onClick={() => setMenuOpen(p => !p)}
+          >
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
@@ -146,10 +150,10 @@ export default function MyBookings() {
             {bookings.map((b) => (
               <div key={b.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
 
-                {/* Top row: status + payment */}
+                {/* Status + payment */}
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                   <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize border ${statusStyle(b.status)}`}>
-                    {b.status}
+                    {b.status.replace("_", " ")}
                   </span>
                   <span className={`text-xs font-medium ${paymentStyle(b.payment_status)}`}>
                     💳 {b.payment_status?.replace("_", " ") || "unpaid"}
@@ -180,7 +184,7 @@ export default function MyBookings() {
                   </div>
                 )}
 
-                {/* ✅ Fee breakdown */}
+                {/* Fee breakdown */}
                 {b.job_price > 0 && (
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-sm space-y-1">
                     <div className="flex justify-between text-gray-600">
@@ -202,90 +206,114 @@ export default function MyBookings() {
                   </div>
                 )}
 
-               {/* Action buttons */}
-<div className="flex flex-wrap gap-2">
+                {/* Action buttons */}
+                <div className="flex flex-wrap gap-2">
 
-  {/* TECHNICIAN — pending: set price or decline */}
-  {b.status === "pending" && isTech && (
-    <SetPriceForm bookingId={b.id} token={token!} onPriceSet={(updated) =>
-      setBookings(prev => prev.map(x => x.id === b.id ? updated : x))
-    } />
-  )}
+                  {/* TECHNICIAN — pending: set price */}
+                  {b.status === "pending" && isTech && (
+                    <SetPriceForm
+                      bookingId={b.id}
+                      token={token!}
+                      onPriceSet={(updated) =>
+                        setBookings(prev => prev.map(x => x.id === b.id ? updated : x))
+                      }
+                    />
+                  )}
 
-  {/* CLIENT — price set: see price + accept or cancel */}
-  {b.status === "price_set" && !isTech && (
-    <div className="w-full space-y-2">
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm">
-        <p className="font-semibold text-yellow-800 mb-1">⚠️ Technician set a price — review and decide</p>
-        <p className="text-gray-600">Job: <span className="font-medium">{b.job_price?.toLocaleString()} LEK</span></p>
-        <p className="text-gray-600">Deposit: <span className="font-medium text-blue-600">{b.booking_fee?.toLocaleString()} LEK</span></p>
-        <p className="text-gray-400 text-xs">Platform fee: {b.platform_fee?.toLocaleString()} LEK</p>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={async () => {
-            const res = await fetch(`${API_URL}/bookings/${b.id}/accept-price`, {
-              method: "POST",
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
-            if (res.ok) setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
-          }}
-          className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
-        >
-          ✅ Accept Price
-        </button>
-        <button
-          onClick={() => updateStatus(b.id, "cancelled")}
-          className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
-        >
-          ❌ Decline
-        </button>
-      </div>
-    </div>
-  )}
+                  {/* CLIENT — price set: accept or decline */}
+                  {b.status === "price_set" && !isTech && (
+                    <div className="w-full space-y-2">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm">
+                        <p className="font-semibold text-yellow-800 mb-1">
+                          ⚠️ Technician set a price — review and decide
+                        </p>
+                        <p className="text-gray-600">
+                          Job: <span className="font-medium">{b.job_price?.toLocaleString()} LEK</span>
+                        </p>
+                        <p className="text-gray-600">
+                          Deposit: <span className="font-medium text-blue-600">{b.booking_fee?.toLocaleString()} LEK</span>
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Platform fee: {b.platform_fee?.toLocaleString()} LEK
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            const res = await fetch(`${API_URL}/bookings/${b.id}/accept-price`, {
+                              method: "POST",
+                              headers: { Authorization: `Bearer ${token}` },
+                            });
+                            const data = await res.json();
+                            if (res.ok) setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
+                          }}
+                          className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
+                        >
+                          ✅ Accept Price
+                        </button>
+                        <button
+                          onClick={() => updateStatus(b.id, "cancelled")}
+                          className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
+                        >
+                          ❌ Decline
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-  {/* TECHNICIAN — confirmed: mark in progress */}
-  {b.status === "confirmed" && isTech && (
-    <button
-      onClick={() => updateStatus(b.id, "in_progress")}
-      className="bg-purple-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-purple-600 transition"
-    >
-      🔧 Mark In Progress
-    </button>
-  )}
+                  {/* TECHNICIAN — confirmed: mark in progress */}
+                  {b.status === "confirmed" && isTech && (
+                    <button
+                      onClick={() => updateStatus(b.id, "in_progress")}
+                      className="bg-purple-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-purple-600 transition"
+                    >
+                      🔧 Mark In Progress
+                    </button>
+                  )}
 
-  {/* TECHNICIAN — in progress: mark completed */}
-  {b.status === "in_progress" && isTech && (
-    <button
-      onClick={() => updateStatus(b.id, "completed")}
-      className="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
-    >
-      🏁 Mark Completed
-    </button>
-  )}
+                  {/* TECHNICIAN — in progress: mark completed */}
+                  {b.status === "in_progress" && isTech && (
+                    <button
+                      onClick={() => updateStatus(b.id, "completed")}
+                      className="bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                    >
+                      🏁 Mark Completed
+                    </button>
+                  )}
 
-  {/* Cancel — available to both sides on pending/confirmed */}
-  {["pending", "confirmed"].includes(b.status) && (
-    <button
-      onClick={() => updateStatus(b.id, "cancelled")}
-      className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
-    >
-      ❌ Cancel
-    </button>
-  )}
+                  {/* Cancel — both sides, on pending or confirmed only */}
+                  {["pending", "confirmed"].includes(b.status) && (
+                    <button
+                      onClick={() => updateStatus(b.id, "cancelled")}
+                      className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
+                    >
+                      ❌ Cancel
+                    </button>
+                  )}
 
-</div>
+                </div>
+              </div> {/* ✅ closes booking card */}
             ))}
-          </div>
+          </div> {/* ✅ closes space-y-4 */}
         )}
       </main>
-      function SetPriceForm({ bookingId, token, onPriceSet }: {
+
+      {/* FOOTER */}
+      <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} OneFixAL – All rights reserved.
+      </footer>
+
+    </div>
+  );
+} // ✅ closes MyBookings component
+
+// ── SetPriceForm — outside MyBookings, at bottom of file ─────────
+function SetPriceForm({ bookingId, token, onPriceSet }: {
   bookingId: number;
   token: string;
   onPriceSet: (updated: any) => void;
 }) {
-  const [price, setPrice] = useState("");
+  const [price, setPrice]   = useState("");
   const [saving, setSaving] = useState(false);
 
   const handleSet = async () => {
@@ -302,6 +330,7 @@ export default function MyBookings() {
       });
       const data = await res.json();
       if (res.ok) onPriceSet(data.booking);
+      else alert(data.error || "Failed to set price ❌");
     } catch (err) {
       alert("Failed to set price ❌");
     } finally {
@@ -324,15 +353,8 @@ export default function MyBookings() {
         disabled={saving}
         className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 disabled:opacity-50 transition"
       >
-        {saving ? "Saving..." : "✅ Set Price & Accept"}
+        {saving ? "Saving..." : "✅ Set Price"}
       </button>
-    </div>
-  );
-}
-
-      <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
-        © {new Date().getFullYear()} OneFixAL – All rights reserved.
-      </footer>
     </div>
   );
 }
