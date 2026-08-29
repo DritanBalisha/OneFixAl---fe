@@ -171,6 +171,135 @@ export default function MyProfile() {
       </nav>
 
       {/* PAGE CONTENT */}
+<main className="flex-1 flex justify-center px-4 py-8">
+  {loading ? (
+    <p className="text-gray-500 mt-8">Loading profile...</p>
+  ) : !profile ? (
+    <p className="text-gray-500 mt-8">No profile found</p>
+  ) : (
+    <div className="w-full max-w-md p-6 border rounded-lg shadow bg-white">
+      <h2 className="text-2xl font-semibold mb-4">My Profile</h2>
+
+      <p><b>Name:</b> {profile.name || "N/A"}</p>
+      <p><b>Email:</b> {profile.email || "N/A"}</p>
+      <p><b>Phone:</b> {profile.phone || "N/A"}</p>
+      <p><b>Role:</b> {profile.role || "Not set"}</p>
+
+      {/* Role selection */}
+      {!profile.role && (
+        <div className="mt-4">
+          <p className="mb-2 font-medium">Select your role:</p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleSetRole("client")}
+              disabled={saving}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            >
+              Client
+            </button>
+            <button
+              onClick={() => handleSetRole("technician")}
+              disabled={saving}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+            >
+              Technician
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ CLIENT SECTION */}
+      {profile.role === "client" && (
+        <div className="mt-6 flex flex-col gap-3">
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            onClick={() => navigate("/techprofiles")}
+          >
+            🔍 Find a Technician
+          </button>
+          <button
+            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+            onClick={() => navigate("/myBookings")}
+          >
+            📋 My Bookings
+          </button>
+        </div>
+      )}
+
+      {/* TECHNICIAN SECTION */}
+      {profile.role === "technician" && (
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2">Technician Details</h3>
+
+          {profile.technicianProfile ? (
+            <>
+              {profile.technicianProfile.profession && (
+                <p><b>Profession:</b> {profile.technicianProfile.profession}</p>
+              )}
+              {profile.technicianProfile.bio && (
+                <p><b>Bio:</b> {profile.technicianProfile.bio}</p>
+              )}
+              {profile.technicianProfile.profile_picture && (
+                <img
+                  src={profile.technicianProfile.profile_picture}
+                  alt="Profile"
+                  className="w-32 rounded mt-2"
+                />
+              )}
+              {profile.technicianProfile.certificate && (
+                <div className="mt-1">
+                  <b>Certificate:</b>{" "}
+                  
+                    href={profile.technicianProfile.certificate}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    View
+                  </a>
+                </div>
+              )}
+              {profile.technicianProfile.experience && (
+                <p><b>Experience:</b> {profile.technicianProfile.experience} years</p>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-gray-400 mb-2">
+              No details yet. Complete your profile to start receiving bookings.
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-col gap-3">
+            <button
+              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+              onClick={() => navigate("/profileupdatetech")}
+            >
+              {profile.technicianProfile ? "✏️ Update Profile" : "✏️ Complete Profile"}
+            </button>
+            {profile.technicianProfile && (
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                onClick={() => navigate("/availability")}
+              >
+                🗓️ Manage Availability
+              </button>
+            )}
+            {profile.technicianProfile && (
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                onClick={() => navigate("/myBookings")}
+              >
+                📋 My Bookings
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+    </div>
+  )}
+</main>
+      /* {/* PAGE CONTENT */}
       <main className="flex-1 flex justify-center px-4 py-8">
         {loading ? (
           <p className="text-gray-500 mt-8">Loading profile...</p>
@@ -283,7 +412,7 @@ export default function MyProfile() {
             )}
           </div>
         )}
-      </main>
+      </main> */
 
       {/* FOOTER */}
       <footer className="bg-white shadow-inner py-6 text-center text-gray-500 text-sm">
