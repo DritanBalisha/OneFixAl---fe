@@ -277,23 +277,24 @@ export default function MyBookings() {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={async () => {
-                            const res = await fetch(`${API_URL}/bookings/${b.id}/accept-price`, {
-                              method: "POST",
-                              headers: { Authorization: `Bearer ${token}` },
-                            });
-                            const data = await res.json();
-                            if (res.ok) {
-                              setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
-                            } else {
-                              alert(data.error || "Failed to accept ❌");
-                            }
-                          }}
-                          className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
-                        >
-                          ✅ Accept Price
-                        </button>
+                       <button
+  onClick={async () => {
+    const res = await fetch(`${API_URL}/bookings/${b.id}/accept-price`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
+      setPaymentBooking(data.booking); // ✅ open payment popup
+    } else {
+      alert(data.error || "Failed to accept ❌");
+    }
+  }}
+  className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
+>
+  ✅ Accept Price
+</button>
                         <button
                           onClick={() => updateStatus(b.id, "cancelled")}
                           className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
