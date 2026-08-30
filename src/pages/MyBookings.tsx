@@ -284,12 +284,24 @@ export default function MyBookings() {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    if (res.ok) {
-      setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
-      setPaymentBooking(data.booking); // ✅ open payment popup
-    } else {
-      alert(data.error || "Failed to accept ❌");
+if (res.ok) {
+  setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
+  // ✅ navigate to payment page with booking data
+  navigate("/payment", {
+    state: {
+      bookingId:     data.booking.id,
+      technicianName: b.technician?.name || "Technician",
+      description:   data.booking.description,
+      timeslot:      data.booking.timeslot,
+      jobPrice:      data.booking.job_price,
+      bookingFee:    data.booking.booking_fee,
+      platformFee:   data.booking.platform_fee,
+      totalAmount:   data.booking.total_amount,
     }
+  });
+} else {
+  alert(data.error || "Failed to accept ❌");
+}
   }}
   className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
 >
