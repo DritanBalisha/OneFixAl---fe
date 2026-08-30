@@ -45,7 +45,12 @@ export default function MyBookings() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to load bookings");
-        setBookings(await res.json());
+        const data = await res.json();
+        // ✅ Sort newest first
+        const sorted = [...data].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setBookings(sorted);
       } catch (err) {
         console.error("Error fetching bookings:", err);
       } finally {
@@ -74,6 +79,21 @@ export default function MyBookings() {
       }
     } catch (err) {
       alert("Failed to update booking ❌");
+    }
+  };
+
+  // ✅ Delete completed/cancelled bookings from view
+  const deleteBooking = async (id: number) => {
+    if (!window.confirm("Remove this booking from your list?")) return;
+    try {
+      const res = await fetch(`${API_URL}/bookings/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      alert("Failed to delete booking ❌");
     }
   };
 
@@ -112,10 +132,7 @@ export default function MyBookings() {
               <Link to="/login" className="text-blue-600 font-medium hover:underline">Login</Link>
             )}
           </div>
-          <button
-            className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5"
-            onClick={() => setMenuOpen(p => !p)}
-          >
+          <button className="md:hidden flex flex-col justify-center items-center w-9 h-9 space-y-1.5" onClick={() => setMenuOpen(p => !p)}>
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
             <span className={`block h-0.5 w-6 bg-gray-700 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
@@ -150,15 +167,37 @@ export default function MyBookings() {
             {bookings.map((b) => (
               <div key={b.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
 
-                {/* Status + payment */}
+                {/* Status + payment + delete */}
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize border ${statusStyle(b.status)}`}>
-                    {b.status.replace("_", " ")}
-                  </span>
-                  <span className={`text-xs font-medium ${paymentStyle(b.payment_status)}`}>
-                    💳 {b.payment_status?.replace("_", " ") || "unpaid"}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize border ${statusStyle(b.status)}`}>
+                      {b.status.replace("_", " ")}
+                    </span>
+                    <span className={`text-xs font-medium ${paymentStyle(b.payment_status)}`}>
+                      💳 {b.payment_status?.replace("_", " ") || "unpaid"}
+                    </span>
+                  </div>
+
+                  {/* ✅ Delete button — only on completed or cancelled */}
+                  {["completed", "cancelled"].includes(b.status) && (
+                    <button
+                      onClick={() => deleteBooking(b.id)}
+                      className="text-xs text-gray-400 hover:text-red-500 transition"
+                      title="Remove from list"
+                    >
+                      🗑️ Remove
+                    </button>
+                  )}
                 </div>
+
+                {/* Date */}
+                {b.created_at && (
+                  <p className="text-xs text-gray-400 mb-3">
+                    📅 Booked on {new Date(b.created_at).toLocaleDateString("en-GB", {
+                      day: "numeric", month: "short", year: "numeric"
+                    })}
+                  </p>
+                )}
 
                 {/* Person info */}
                 <div className="text-sm text-gray-700 mb-3 space-y-0.5">
@@ -231,7 +270,7 @@ export default function MyBookings() {
                           Job: <span className="font-medium">{b.job_price?.toLocaleString()} LEK</span>
                         </p>
                         <p className="text-gray-600">
-                          Deposit: <span className="font-medium text-blue-600">{b.booking_fee?.toLocaleString()} LEK</span>
+                          Deposit due: <span className="font-medium text-blue-600">{b.booking_fee?.toLocaleString()} LEK</span>
                         </p>
                         <p className="text-gray-400 text-xs">
                           Platform fee: {b.platform_fee?.toLocaleString()} LEK
@@ -245,7 +284,11 @@ export default function MyBookings() {
                               headers: { Authorization: `Bearer ${token}` },
                             });
                             const data = await res.json();
-                            if (res.ok) setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
+                            if (res.ok) {
+                              setBookings(prev => prev.map(x => x.id === b.id ? data.booking : x));
+                            } else {
+                              alert(data.error || "Failed to accept ❌");
+                            }
                           }}
                           className="bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition"
                         >
@@ -258,6 +301,23 @@ export default function MyBookings() {
                           ❌ Decline
                         </button>
                       </div>
+                    </div>
+                  )}
+
+                  {/* ✅ CLIENT — confirmed: payment instructions */}
+                  {b.status === "confirmed" && !isTech && (
+                    <div className="w-full bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm">
+                      <p className="font-semibold text-green-800 mb-1">✅ Job Confirmed!</p>
+                      <p className="text-gray-600">
+                        Please pay the deposit of{" "}
+                        <span className="font-semibold text-blue-600">
+                          {b.booking_fee?.toLocaleString()} LEK
+                        </span>{" "}
+                        to the technician when they arrive.
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Remaining {((b.total_amount || 0) - (b.booking_fee || 0)).toLocaleString()} LEK due after job completion.
+                      </p>
                     </div>
                   )}
 
@@ -281,8 +341,8 @@ export default function MyBookings() {
                     </button>
                   )}
 
-                                  {/* Cancel — both sides, on pending or confirmed only */}
-                  {["pending", "confirmed"].includes(b.status) && (
+                  {/* Cancel — both sides, pending or price_set only */}
+                  {["pending", "price_set"].includes(b.status) && (
                     <button
                       onClick={() => updateStatus(b.id, "cancelled")}
                       className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600 transition"
@@ -290,6 +350,7 @@ export default function MyBookings() {
                       ❌ Cancel
                     </button>
                   )}
+
                 </div>
               </div>
             ))}
@@ -304,9 +365,9 @@ export default function MyBookings() {
 
     </div>
   );
-} // ✅ closes MyBookings component
+}
 
-// ── SetPriceForm — outside MyBookings, at bottom of file ─────────
+// ── SetPriceForm ─────────────────────────────────────────────────
 function SetPriceForm({ bookingId, token, onPriceSet }: {
   bookingId: number;
   token: string;
