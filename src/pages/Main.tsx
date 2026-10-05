@@ -45,7 +45,7 @@ export default function HomePage({ user }: HomePageProps) {
     }
   }, [navigate]);
 
-  const handleLogout = () => { // Ensure lucid
+  const handleLogout = () => { // Ensure luc
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     window.location.reload();
