@@ -1,367 +1,169 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("user");
 
-  // Check login state mock/local storage safely
   useEffect(() => {
-    try {
-      const userData = localStorage.getItem("user");
-      if (userData) {
-        setIsLoggedIn(true);
-      }
-    } catch (e) {
-      console.log("LocalStorage check skipped");
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        if (parsed.role) navigate("/home");
+      } catch {}
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-    } catch (e) {}
-    setIsLoggedIn(false);
-    setMenuOpen(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    window.location.reload();
   };
 
   const services = [
-    { icon: "⚡", name: "Electrician", desc: "Wiring, panels & outlets" },
-    { icon: "🔧", name: "Plumber", desc: "Pipes, leaks & drains" },
-    { icon: "❄️", name: "AC Tech", desc: "Install & maintenance" },
-    { icon: "🪵", name: "Carpenter", desc: "Furniture & woodwork" },
+    { icon: "⚡", name: "Electrician", desc: "Wiring, panels, outlets" },
+    { icon: "🔧", name: "Plumber", desc: "Pipes, leaks, installations" },
+    { icon: "❄️", name: "AC Technician", desc: "Install, repair, service" },
+    { icon: "🪵", name: "Carpenter", desc: "Furniture, doors, floors" },
     { icon: "🎨", name: "Painter", desc: "Interior & exterior" },
-    { icon: "📱", name: "Electronics", desc: "Appliances & TVs" },
+    { icon: "📱", name: "Electronics", desc: "Phones, TVs, appliances" },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans antialiased overflow-x-hidden selection:bg-blue-500 selection:text-white">
-      {}
-      {/* ── STICKY TOP NAVBAR ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          
-          {/* Logo */}
-          <a href="#" className="flex items-center gap-1.5 focus:outline-none">
-            <span className="text-2xl font-black text-blue-600 tracking-tight">OneFix<span className="text-gray-900">AL</span></span>
-          </a>
-
-          {/* Desktop Links (Hidden on iPhone XS / Mobile) */}
-          <nav className="hidden md:flex items-center gap-7">
-            <a href="#services" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
-              Services
-            </a>
-            <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
-              How it Works
-            </a>
-            <a href="#technicians" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
-              Find a Technician
-            </a>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 py-4 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <span className="text-2xl font-black text-blue-600 tracking-tight">OneFixAL</span>
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/techprofiles" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition">Find a Technician</Link>
             {isLoggedIn ? (
-              <div className="flex items-center gap-4">
-                <a href="#profile" className="text-sm font-semibold text-gray-700 hover:text-blue-600">
-                  My Profile
-                </a>
-                <button
-                  onClick={handleLogout}
-                  className="text-xs font-semibold text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition"
-                >
-                  Logout
-                </button>
-              </div>
+              <>
+                <Link to="/myProfile" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition">My Profile</Link>
+                <button onClick={handleLogout} className="text-sm text-red-500 font-medium hover:bg-red-50 px-3 py-1.5 rounded-lg transition">Logout</button>
+              </>
             ) : (
-              <div className="flex items-center gap-3">
-                <a href="#login" className="text-sm font-semibold text-gray-700 hover:text-blue-600 px-3 py-2">
-                  Sign in
-                </a>
-                <a
-                  href="#signup"
-                  className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition shadow-sm active:scale-95"
-                >
-                  Get started
-                </a>
-              </div>
+              <>
+                <Link to="/login" className="text-sm text-gray-600 font-medium hover:text-blue-600 transition">Sign in</Link>
+                <Link to="/signup" className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">Get started</Link>
+              </>
             )}
-          </nav>
-
-          {/* Mobile 3-Bar Hamburger Button (Visible on iPhone XS and mobile) */}
-          <button
-            type="button"
-            className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-xl bg-gray-50 active:bg-gray-200 border border-gray-200 text-gray-800 focus:outline-none transition-colors"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={menuOpen}
-          >
-            {/* 3 Horizontal Bars Icon */}
-            <div className="w-5 flex flex-col items-center justify-between h-3.5 relative">
-              <span
-                className={`block w-5 h-0.5 bg-gray-800 rounded-full transition-all duration-300 ease-in-out ${
-                  menuOpen ? "rotate-45 translate-y-[6px]" : ""
-                }`}
-              />
-              <span
-                className={`block w-5 h-0.5 bg-gray-800 rounded-full transition-all duration-200 ease-in-out ${
-                  menuOpen ? "opacity-0 scale-x-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`block w-5 h-0.5 bg-gray-800 rounded-full transition-all duration-300 ease-in-out ${
-                  menuOpen ? "-rotate-45 -translate-y-[6px]" : ""
-                }`}
-              />
-            </div>
+          </div>
+          <button className="md:hidden flex flex-col gap-1.5 p-1" onClick={() => setMenuOpen(p => !p)} aria-label="Menu">
+            <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 origin-center ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-700 transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-700 transition-transform duration-200 origin-center ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </button>
         </div>
-
-        {/* Mobile Animated Dropdown Navigation */}
         {menuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-3 pb-6 shadow-xl animate-fadeIn">
-            <div className="flex flex-col gap-1">
-              <a
-                href="#technicians"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between text-gray-800 font-semibold text-base py-3 px-3.5 rounded-xl hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100 transition"
-              >
-                <span>Find a Technician</span>
-                <span className="text-gray-400">→</span>
-              </a>
-              <a
-                href="#services"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between text-gray-700 font-medium text-base py-3 px-3.5 rounded-xl hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100 transition"
-              >
-                <span>Services Category</span>
-                <span className="text-gray-400">→</span>
-              </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between text-gray-700 font-medium text-base py-3 px-3.5 rounded-xl hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100 transition"
-              >
-                <span>How it Works</span>
-                <span className="text-gray-400">→</span>
-              </a>
-
-              <hr className="my-2 border-gray-100" />
-
-              {isLoggedIn ? (
-                <>
-                  <a
-                    href="#profile"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-between text-gray-800 font-semibold text-base py-3 px-3.5 rounded-xl hover:bg-blue-50 active:bg-blue-100 transition"
-                  >
-                    <span>My Account Profile</span>
-                    <span className="text-blue-600 font-bold">👤</span>
-                  </a>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left text-red-600 font-semibold text-base py-3 px-3.5 rounded-xl hover:bg-red-50 active:bg-red-100 transition"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2 pt-1">
-                  <a
-                    href="#login"
-                    onClick={() => setMenuOpen(false)}
-                    className="w-full text-center text-gray-800 font-semibold py-3 rounded-xl border border-gray-200 active:bg-gray-100 transition text-sm"
-                  >
-                    Sign In
-                  </a>
-                  <a
-                    href="#signup"
-                    onClick={() => setMenuOpen(false)}
-                    className="w-full text-center text-white bg-blue-600 font-semibold py-3 rounded-xl shadow-md active:bg-blue-700 transition text-sm"
-                  >
-                    Get Started Free
-                  </a>
-                </div>
-              )}
-            </div>
+          <div className="md:hidden pt-4 pb-2 border-t border-gray-100 mt-4 flex flex-col gap-3 max-w-6xl mx-auto px-4 sm:px-6">
+            <Link to="/techprofiles" className="text-gray-700 py-1 text-sm" onClick={() => setMenuOpen(false)}>Find a Technician</Link>
+            {isLoggedIn ? (
+              <>
+                <Link to="/myProfile" className="text-gray-700 py-1 text-sm" onClick={() => setMenuOpen(false)}>My Profile</Link>
+                <button onClick={() => { setMenuOpen(false); handleLogout(); }} className="text-red-500 text-sm text-left py-1">Logout</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-gray-700 py-1 text-sm" onClick={() => setMenuOpen(false)}>Sign in</Link>
+                <Link to="/signup" className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg text-center" onClick={() => setMenuOpen(false)}>Get started</Link>
+              </>
+            )}
           </div>
         )}
-      </header>
+      </nav>
 
-      {}
-      {/* ── HERO SECTION ──────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 text-white px-4 sm:px-6 pt-8 pb-12 sm:py-20 relative overflow-hidden">
-        {/* Subtle decorative mesh background effect */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center relative z-10">
-          
-          {/* Hero Main Content */}
-          <div className="text-left">
-            <div className="inline-flex items-center gap-2 bg-blue-500/30 backdrop-blur-md border border-blue-300/30 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span>Available in Tirana, Albania</span>
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white px-4 sm:px-6 py-14 md:py-28">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-blue-500 bg-opacity-40 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
+              Available in Tirana, Albania
             </div>
-
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl font-black tracking-tight leading-[1.15] mb-3">
-              Find a trusted <br className="hidden xs:block" />
-              <span className="text-blue-200">technician</span>, fast.
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-5">
+              Find a trusted<br />technician,<br />
+              <span className="text-blue-200">in minutes.</span>
             </h1>
-
-            <p className="text-blue-100 text-sm sm:text-base leading-relaxed mb-6 max-w-md">
-              Connect with verified local experts in Tirana. Book electricians, plumbers, & repairs in seconds with upfront pricing.
+            <p className="text-blue-100 text-lg leading-relaxed mb-8 max-w-md">
+              OneFixAL connects you with verified, qualified technicians across Tirana. Book, track, and pay — all in one place.
             </p>
-
-            {/* Mobile Call to Action Buttons */}
-            <div className="flex flex-col xs:flex-row gap-2.5">
-              <a
-                href="#technicians"
-                className="w-full xs:w-auto bg-white text-blue-700 font-bold text-center px-6 py-3.5 rounded-xl shadow-lg active:scale-98 hover:bg-blue-50 transition text-sm flex items-center justify-center gap-2"
-              >
-                <span>Find a Technician</span>
-                <span>→</span>
-              </a>
-              <a
-                href="#signup"
-                className="w-full xs:w-auto bg-blue-500/30 border border-blue-300/30 text-white font-semibold text-center px-6 py-3.5 rounded-xl active:bg-blue-500/50 hover:bg-blue-500/40 transition text-sm"
-              >
-                Join as Professional
-              </a>
+            {/* Mobile trust pills — shown only on mobile in place of booking card */}
+            <div className="flex flex-wrap gap-2 mb-6 md:hidden">
+              <span className="inline-flex items-center gap-1.5 bg-blue-500 bg-opacity-40 border border-blue-400 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full">✅ Verified</span>
+              <span className="inline-flex items-center gap-1.5 bg-blue-500 bg-opacity-40 border border-blue-400 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full">⚡ Fast Booking</span>
+              <span className="inline-flex items-center gap-1.5 bg-blue-500 bg-opacity-40 border border-blue-400 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-full">💬 Fair Pricing</span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link to="/techprofiles" className="w-full sm:w-auto bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition shadow-sm text-center">Find a Technician</Link>
+              <Link to="/signup" className="w-full sm:w-auto bg-blue-500 bg-opacity-40 text-white font-semibold px-6 py-3 rounded-xl hover:bg-opacity-60 border border-blue-400 transition text-center">Join as Technician</Link>
             </div>
           </div>
-
-          {/* iPhone XS Responsive Mockup Card */}
-          <div className="mt-2 md:mt-0 flex justify-center">
-            <div className="w-full max-w-[345px] xs:max-w-sm bg-white rounded-2xl shadow-2xl p-4 text-gray-800 border border-blue-100">
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-lg shrink-0">
-                    ⚡
-                  </div>
-                  <div className="truncate">
-                    <p className="font-bold text-sm text-gray-900 truncate">Ardit Krasniqi</p>
-                    <p className="text-[11px] text-gray-500 truncate">Licensed Electrician · 8y exp</p>
-                  </div>
-                </div>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full shrink-0">
-                  Verified
-                </span>
-              </div>
-
-              {/* Service Details Snippet */}
-              <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-100">
-                <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Issue Overview</p>
-                <p className="text-xs text-gray-700 italic">"Short circuit repair & circuit breaker panel check"</p>
-              </div>
-
-              {/* Pricing breakdown */}
-              <div className="space-y-1.5 text-xs mb-3.5">
-                <div className="flex justify-between text-gray-600">
-                  <span>Job Estimate</span>
-                  <span className="font-semibold text-gray-800">4,500 LEK</span>
-                </div>
-                <div className="flex justify-between text-blue-600 font-medium">
-                  <span>Deposit (10%)</span>
-                  <span>450 LEK</span>
-                </div>
-              </div>
-
-              <a
-                href="#book"
-                className="block w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-center py-2.5 rounded-xl shadow-sm transition text-xs"
-              >
-                Book Appointment
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {}
-      {/* ── STATS BAR ─────────────────────────────────────────── */}
-      <section className="bg-blue-50/80 border-y border-blue-100 py-4 px-4">
-        <div className="max-w-6xl mx-auto grid grid-cols-3 gap-2 text-center">
-          <div className="p-1">
-            <p className="text-lg xs:text-xl sm:text-2xl font-black text-blue-600">100+</p>
-            <p className="text-[10px] xs:text-xs text-gray-600 font-medium">Verified Techs</p>
-          </div>
-          <div className="p-1 border-x border-blue-200/60">
-            <p className="text-lg xs:text-xl sm:text-2xl font-black text-blue-600">500+</p>
-            <p className="text-[10px] xs:text-xs text-gray-600 font-medium">Jobs Fixed</p>
-          </div>
-          <div className="p-1">
-            <p className="text-lg xs:text-xl sm:text-2xl font-black text-blue-600">4.9★</p>
-            <p className="text-[10px] xs:text-xs text-gray-600 font-medium">Client Rating</p>
-          </div>
-        </div>
-      </section>
-
-      {}
-      {/* ── SERVICES GRID ────────────────────────────────────── */}
-      <section id="services" className="py-10 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Our Services</h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">Select a category to find specialized professionals</p>
-          </div>
-
-          {/* 2-column grid on mobile / iPhone XS */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {services.map((s) => (
-              <a
-                key={s.name}
-                href="#technicians"
-                className="bg-gray-50 hover:bg-blue-50 border border-gray-200/80 hover:border-blue-300 rounded-2xl p-3.5 flex flex-col justify-between transition-all duration-200 active:scale-95 group"
-              >
+          {/* Booking card mockup — desktop only */}
+          <div className="hidden md:flex justify-center">
+            <div className="bg-white rounded-2xl shadow-2xl p-5 w-72 text-gray-800">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl">⚡</div>
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-white shadow-xs flex items-center justify-center text-xl mb-2.5 group-hover:scale-110 transition-transform">
-                    {s.icon}
-                  </div>
-                  <h3 className="font-bold text-gray-900 text-xs sm:text-sm group-hover:text-blue-600 transition">
-                    {s.name}
-                  </h3>
-                  <p className="text-[11px] text-gray-500 mt-1 leading-snug line-clamp-2">
-                    {s.desc}
-                  </p>
+                  <p className="font-semibold text-sm">Ardit Krasniqi</p>
+                  <p className="text-xs text-gray-400">Electrician · 8 yrs exp.</p>
                 </div>
-              </a>
-            ))}
+                <span className="ml-auto text-xs bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full">Available</span>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 mb-4 text-xs text-gray-600">
+                <p className="font-medium text-gray-700 mb-1">Problem</p>
+                <p className="italic">Electrical panel making strange sounds and tripping breakers.</p>
+              </div>
+              <div className="space-y-1.5 text-xs mb-4">
+                <div className="flex justify-between text-gray-500"><span>Job Price</span><span className="font-medium text-gray-700">4,500 LEK</span></div>
+                <div className="flex justify-between text-blue-600"><span>Deposit (10%)</span><span className="font-medium">450 LEK</span></div>
+                <div className="border-t border-gray-100 pt-1 flex justify-between font-semibold text-gray-800"><span>Total</span><span>4,500 LEK</span></div>
+              </div>
+              <div className="bg-green-500 text-white text-xs font-bold text-center py-2 rounded-lg">✅ Booking Confirmed</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {}
-      {/* ── HOW IT WORKS ──────────────────────────────────────── */}
-      <section id="how-it-works" className="py-10 sm:py-16 bg-gray-50/70 border-y border-gray-100 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="text-[11px] font-bold tracking-wider text-blue-600 uppercase">Simple Process</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mt-1">How OneFixAL Works</h2>
-          </div>
+      {/* Stats bar */}
+      <section className="bg-blue-50 border-y border-blue-100 py-6 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-3 gap-4 text-center divide-x divide-blue-200">
+          {[
+            { value: "100+", label: "Verified Technicians" },
+            { value: "500+", label: "Jobs Completed" },
+            { value: "4.8★", label: "Average Rating" },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className="text-xl sm:text-2xl font-black text-blue-600">{s.value}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+      {/* How it works */}
+      <section className="py-14 md:py-20 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2 text-center">How it works</h2>
+          <p className="text-gray-500 text-center mb-12 text-sm">Book a technician in three simple steps.</p>
+          <div className="relative grid md:grid-cols-3 gap-0 md:gap-10">
             {[
-              {
-                step: "01",
-                title: "Describe your issue",
-                desc: "Choose the service you need and share details about your repair.",
-              },
-              {
-                step: "02",
-                title: "Compare & Select",
-                desc: "Review technician profiles, customer ratings, and transparent quotes.",
-              },
-              {
-                step: "03",
-                title: "Get it Fixed",
-                desc: "Your chosen pro arrives on time. Inspect the result and pay safely.",
-              },
-            ].map((step) => (
-              <div key={step.step} className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-200/80 shadow-xs flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shrink-0">
-                  {step.step}
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-1">{step.title}</h3>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              { icon: "🔍", title: "Describe your problem", desc: "Tell us what needs fixing. Browse verified technicians by specialty and choose who fits." },
+              { icon: "💬", title: "Get a price", desc: "The technician reviews your request and sets a fair price. Accept or decline — no pressure." },
+              { icon: "🔧", title: "Job done", desc: "Your technician arrives at the agreed time. Pay the deposit upfront, the rest when done." },
+            ].map((item, idx, arr) => (
+              <div key={item.title} className="relative flex md:flex-col items-start gap-4 md:gap-0 pb-8 md:pb-0 last:pb-0">
+                {/* Mobile connecting line */}
+                {idx < arr.length - 1 && (
+                  <div className="md:hidden absolute left-6 top-12 bottom-0 w-0.5 bg-blue-100" aria-hidden="true" />
+                )}
+                <div className="relative z-10 w-12 h-12 shrink-0 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl shadow-sm">{item.icon}</div>
+                <div className="md:mt-4">
+                  <h3 className="font-bold text-gray-800 mb-2">{item.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -369,35 +171,91 @@ export default function MainPage() {
         </div>
       </section>
 
-      {}
-      {/* ── BOTTOM CTA ────────────────────────────────────────── */}
-      <section className="bg-blue-600 text-white py-10 px-4 text-center">
-        <div className="max-w-xl mx-auto">
-          <h2 className="text-2xl font-black mb-2">Need a Repair Today?</h2>
-          <p className="text-blue-100 text-xs sm:text-sm mb-6">
-            Book certified Albanian technicians with zero hassle.
-          </p>
-          <a
-            href="#technicians"
-            className="inline-block w-full xs:w-auto bg-white text-blue-700 font-bold px-8 py-3.5 rounded-xl shadow-lg active:bg-blue-50 transition text-sm"
-          >
-            Find a Professional Now
-          </a>
+      {/* Service categories */}
+      <section className="bg-gray-50 py-14 md:py-20 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2 text-center">What can we fix?</h2>
+          <p className="text-gray-500 text-center mb-12 text-sm">Qualified technicians across all home and business services.</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {services.map((s) => (
+              <Link key={s.name} to="/techprofiles" className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 hover:border-blue-300 hover:shadow-sm transition group">
+                <span className="text-2xl md:text-3xl mb-3 block">{s.icon}</span>
+                <p className="font-semibold text-gray-800 text-sm group-hover:text-blue-600 transition">{s.name}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{s.desc}</p>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link to="/techprofiles" className="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 transition text-sm">Browse all technicians</Link>
+          </div>
         </div>
       </section>
 
-      {/* ── FOOTER ────────────────────────────────────────────── */}
-      <footer className="bg-gray-900 text-gray-400 py-8 px-4 text-xs">
-        <div className="max-w-6xl mx-auto flex flex-col items-center gap-4 text-center">
-          <span className="text-white font-black text-xl tracking-tight">OneFix<span className="text-blue-500">AL</span></span>
-          <p className="text-gray-500 max-w-xs">Connecting households and businesses in Tirana with verified technicians.</p>
-          <div className="flex flex-wrap justify-center gap-4 text-gray-300 font-medium">
-            <a href="#services" className="hover:text-white">Services</a>
-            <a href="#technicians" className="hover:text-white">Technicians</a>
-            <a href="#login" className="hover:text-white">Sign In</a>
-            <a href="#signup" className="hover:text-white">Register</a>
+      {/* Why OneFixAL */}
+      <section className="py-14 md:py-20 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-6">Why OneFixAL?</h2>
+            <div className="space-y-5">
+              {[
+                { icon: "✅", title: "Verified & certified", desc: "Every technician is manually verified with certificates and qualifications checked." },
+                { icon: "💬", title: "You see the price first", desc: "The technician sets a fair price after reading your problem. Accept or decline — no hidden fees." },
+                { icon: "🔒", title: "Transparent pricing", desc: "Small deposit upfront to confirm the booking. Pay the rest in cash when the job is done." },
+                { icon: "⚡", title: "Fast booking", desc: "Browse availability and book in under 2 minutes. No phone calls needed." },
+              ].map((f) => (
+                <div key={f.title} className="flex gap-4">
+                  <span className="text-2xl mt-0.5 shrink-0">{f.icon}</span>
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm">{f.title}</p>
+                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed">{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="text-gray-600 text-[11px] pt-2">© {new Date().getFullYear()} OneFixAL. All rights reserved.</p>
+          <div className="space-y-4">
+            {[
+              { name: "Blerina M.", role: "Client, Tirana", text: "Found an electrician in 10 minutes. He came the next morning and fixed everything. Highly recommend!", rating: 5 },
+              { name: "Erjon K.", role: "Plumber, OneFixAL Technician", text: "As a technician, I get new clients every week. The booking system is simple and I'm always paid fairly.", rating: 5 },
+            ].map((t) => (
+              <div key={t.name} className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                <div className="flex gap-0.5 mb-3">{Array.from({ length: t.rating }).map((_, i) => <span key={i} className="text-amber-400 text-sm">★</span>)}</div>
+                <p className="text-gray-700 text-sm italic mb-4">"{t.text}"</p>
+                <div>
+                  <p className="font-semibold text-gray-800 text-sm">{t.name}</p>
+                  <p className="text-xs text-gray-400">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Banner */}
+      <section className="bg-blue-600 text-white py-16 px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-black mb-3">Ready to fix something?</h2>
+          <p className="text-blue-100 mb-8 text-sm">Join hundreds of people in Tirana who use OneFixAL to find trusted help fast.</p>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
+            <Link to="/signup" className="w-full sm:w-auto bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition text-center">Create free account</Link>
+            <Link to="/techprofiles" className="w-full sm:w-auto bg-blue-500 bg-opacity-50 border border-blue-400 text-white font-semibold px-6 py-3 rounded-xl hover:bg-opacity-70 transition text-center">Browse technicians</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-10 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+            <span className="text-white font-black text-xl">OneFixAL</span>
+            <p className="text-xs text-gray-500 mt-1">Connecting Tirana with trusted technicians.</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link to="/techprofiles" className="hover:text-white transition">Find a Technician</Link>
+            <Link to="/signup" className="hover:text-white transition">Join as Technician</Link>
+            <Link to="/login" className="hover:text-white transition">Sign in</Link>
+          </div>
+          <p className="text-xs text-gray-600">© {new Date().getFullYear()} OneFixAL. All rights reserved.</p>
         </div>
       </footer>
     </div>
